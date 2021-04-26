@@ -4,7 +4,12 @@ using UnityEngine;
 
 public class PuzzleList : MonoBehaviour
 {
-    List<Puzzle> EasyPuzzles = new List<Puzzle>();
+    public static PuzzleList puzzleList;
+    public void Awake()
+    {
+        puzzleList = this;
+    }
+    public List<Puzzle> EasyPuzzles = new List<Puzzle>();
     List<Puzzle> MediumPuzzles = new List<Puzzle>();
     List<Puzzle> HardPuzzles = new List<Puzzle>();
 

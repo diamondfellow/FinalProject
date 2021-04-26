@@ -2,9 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Puzzle : MonoBehaviour
+public class Puzzle : Interactable
 {
-    public virtual void Interact()
+
+    public virtual void PuzzleComplete()
     {
 
     }

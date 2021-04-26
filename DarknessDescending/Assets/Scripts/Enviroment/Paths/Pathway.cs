@@ -11,6 +11,9 @@ public class Pathway : MonoBehaviour
 
     private bool hittingOtherPath = false;
     public List<Vector3> puzzlePoints = new List<Vector3>();
+    
+
+
     public List<int> FindOpens()
     {
         List<int> Opens = new List<int>();

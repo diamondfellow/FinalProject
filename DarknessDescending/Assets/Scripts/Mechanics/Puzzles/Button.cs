@@ -19,7 +19,7 @@ public class Button : Puzzle
     {
         gameObject.GetComponent<Material>().color = onColor;
     }
-    [Command]
+    [Server]
     private void ButtonPressed()
     {
         gameMangaer.PuzzleComplete(1);

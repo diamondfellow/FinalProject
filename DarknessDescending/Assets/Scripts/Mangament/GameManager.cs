@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.SceneManagement;
+//using System;
 
 public class GameManager : MonoBehaviour
 {
@@ -11,15 +12,18 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Pathway RightStart;
     [SerializeField] private Pathway LeftStart;
     [SerializeField] private float gameScaling = .1f; //Amount per stage increase in percent .1 - 1;
+    [SerializeField] private float stageEndTimer;
     public int NumberofPlayers;
 
-    
-    private int puzzlesToBeSolved;
+    private float timer;
+    private bool stageEnding = false;
+    private int puzzlesToBeSolved = 0;
     private int currentStageNumber = 0;
     private bool isSingleplayer = false;
     private int stageFloorType;
     private List<Pathway> allStagePathways = new List<Pathway>();
     private float gameScale;
+
     [ServerCallback]
     public void Awake()
     {
@@ -31,11 +35,27 @@ public class GameManager : MonoBehaviour
         {
             isSingleplayer = false;
         }
+        gameScale = 1;
+        timer = stageEndTimer;
     }
     [ServerCallback]
     public void Start()
     {
         StartGame();
+    }
+    [ServerCallback]
+    public void Update()
+    {
+        if (stageEnding)
+        {
+            timer -= Time.deltaTime;
+            if(timer < 0)
+            {
+                StartNewFloor();
+                stageEnding = false;
+                timer = stageEndTimer;
+            }
+        }
     }
     #region MultStartcode
     [Server]
@@ -46,27 +66,46 @@ public class GameManager : MonoBehaviour
         currentStageNumber = 0;
         BuildMap();
     }
+    [Server]
     public void StartStage()
     {
         // allows players to see and move
         currentStageNumber += 1;
     }
+    [Server]
     public void StartNewFloor()
     {
         gameScale += gameScaling;
+        foreach(Pathway pathway in allStagePathways)
+        {
+            Destroy(pathway.gameObject);
+            NetworkServer.Destroy(pathway.gameObject);
+        }
+        foreach (GameObject basePathway in GameObject.FindGameObjectsWithTag("Pathway"))
+        {
+            for(int i = 0; i > 4; i++) 
+            {
+                basePathway.GetComponent<Pathway>().openPaths[i] = true;
+            }
+        }
+        BuildMap();
     }
-    [ClientRpc]
+    [Server]
     public void PuzzleComplete(int puzzlesCompleted)
     {
-        puzzlesToBeSolved += puzzlesCompleted;
+        puzzlesToBeSolved -= puzzlesCompleted;
+        if(puzzlesToBeSolved == 0)
+        {
+            stageEnding = true;
+        }
     }
     #endregion
     #region StageBuild
     [Server]
     public void BuildMap()
     {
-        int partsPerSection = 5;
-        partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale);
+        int partsPerSection = 3;
+        partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale * NumberofPlayers);
         stageFloorType = Random.Range(0, (FloorList.floorList.numberOfFloorTypes + 1));
         for (int o = 0; o <= 3; o++)
         {
@@ -100,13 +139,15 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < partsPerSection; i++)
         {
             Pathway nextPlacement = currentSectionPathways[Random.Range(0, (currentSectionPathways.Count + 1))];
-            GameObject NewestObject = Instantiate(FloorList.floorList.RandomFloorType(stageFloorType), nextPlacement.transform.position, Quaternion.identity);
-            // attatch to nextPlacement
+            GameObject NewestObject = Instantiate(FloorList.floorList.RandomFloorType(stageFloorType), nextPlacement.gameObject.transform);
+            NetworkServer.Spawn(NewestObject);
+            //NewestObject.transform.position = 
             if (NewestObject.GetComponent<Pathway>().IsHitting())
             {
                 PlaceEndCap(nextPlacement, -1);
                 currentSectionPathways.Remove(nextPlacement);
                 Destroy(NewestObject);
+                NetworkServer.Destroy(NewestObject);
             }
             else
             {
@@ -136,23 +177,39 @@ public class GameManager : MonoBehaviour
         NetworkServer.Spawn(EndCap);
         // Attatch to EndPath
     }
+    [Server]
+    public void MonsterSpawn()
+    {
+        int amountOfMonster = 1 + Mathf.FloorToInt((currentStageNumber * NumberofPlayers)/ 3);
+        for(int i = 0; i < amountOfMonster; i++)
+        {
+            GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];
+            GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count + 1)].monsterSpawnPosition, Quaternion.identity);
+            NetworkServer.Spawn(spawnedMonster);
+        }
+
+    }
     #endregion
     #region PuzzlePlace
     [Server]
     public void PlacePuzzles()
     {
-        puzzlesToBeSolved = Mathf.CeilToInt(NumberofPlayers * gameScaling);
+        puzzlesToBeSolved = 3 + (NumberofPlayers * currentStageNumber);
         List<Pathway> puzzlePathways = allStagePathways;
         for (int i = 0; i < puzzlesToBeSolved; i++)
         {
 
             Transform randomPathway = puzzlePathways[Random.Range(0, allStagePathways.Count + 1)].transform;
+            Transform randomPuzzlePoint = randomPathway.GetComponent<Pathway>().puzzlePoints
+                [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count + 1)].transform;
             GameObject puzzle = Instantiate(PuzzleList.puzzleList.EasyPuzzles
-                [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count + 1)].gameObject, randomPathway);
+                [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count + 1)].gameObject, randomPuzzlePoint);
             NetworkServer.Spawn(puzzle);
-            puzzle.transform.position += randomPathway.GetComponent<Pathway>().puzzlePoints
-                [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count + 1)];
+            puzzle.transform.position = Vector3.zero;
+            puzzle.transform.rotation = randomPuzzlePoint.rotation;
+            
         }
+        
     }
 
     // For extraPuzzles

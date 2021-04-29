@@ -3,24 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class PlayerMVE : MonoBehaviour
+public class PlayerMVE : NetworkBehaviour
 {
     public bool canMove = false;
     public bool spectate = false;
+    
 
     private Camera mainCam;
     [SerializeField] private float lookSpeed;
     [SerializeField] private float moveSpeed;
-
+    [SerializeField] private Canvas loadingCanvas;
     private void Awake()
     {
+        if (!hasAuthority)
+        {
+            for(int i = 0; i < transform.childCount; i++)
+            {
+                Destroy( transform.GetChild(i).gameObject);
+                NetworkServer.Destroy(transform.GetChild(i).gameObject);
+            }
+        }
         mainCam = Camera.main;
     }
     //[ClientCallback]
     // Update is called once per frame
     void Update()
     {
-        //if(!hasAuthority) { return; }
+        if(!hasAuthority) { return; }
         //Left to right Camera
         Debug.Log("e");
         Vector3 playerRotation = gameObject.transform.rotation.eulerAngles;
@@ -48,6 +57,11 @@ public class PlayerMVE : MonoBehaviour
         {
             //movement 
         }
-
+    }
+    [Client]
+    public void SeeMove()
+    {
+        loadingCanvas.enabled = !loadingCanvas.enabled;
+        canMove = !canMove;
     }
 }

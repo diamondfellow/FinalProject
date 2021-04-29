@@ -6,6 +6,7 @@ using Mirror;
 public class PlayerInteract : NetworkBehaviour
 {
     [SerializeField ]private float interactDistance;
+    [SerializeField] private Light headlamp;
     [ClientCallback]
     void Update()
     {
@@ -21,11 +22,31 @@ public class PlayerInteract : NetworkBehaviour
                 {
                     Interact(objectInteract);
                 }
-            }
-               
-            
+            }       
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            headlamp.enabled = !headlamp.enabled;
+            CmdFlashligt();
         }
     }
+    #region FlashLight
+    [Command]
+    private void CmdFlashligt()
+    {
+        SvrFlashlight();
+    }
+    [Server] private void SvrFlashlight()
+    {
+        ClntFlashlight();
+    }
+    [ClientRpc]
+    private void ClntFlashlight()
+    {
+        headlamp.enabled = !headlamp.enabled;
+    }
+    #endregion
+
     [Command]
     private void Interact(Interactable objectToInteract)
     {

@@ -5,19 +5,29 @@ using Mirror;
 using UnityEngine.SceneManagement;
 //using System;
 
-public class GameManager : MonoBehaviour
+public class GameManager : NetworkBehaviour
 {
+    public static GameManager gameMan;
+
+    public int NumberofPlayers;
+    public List<NetworkConnection> playerConnections = new List<NetworkConnection>();
+
+    [SerializeField] private GameUI gameUI;
     [SerializeField] private Pathway UpStart;
     [SerializeField] private Pathway DownStart;
     [SerializeField] private Pathway RightStart;
     [SerializeField] private Pathway LeftStart;
+    [SerializeField] private Transform[] spawnPositions = new Transform[4];
+    [SerializeField] private GameObject[] doorButtons = new GameObject[4];
+
     [SerializeField] private float gameScaling = .1f; //Amount per stage increase in percent .1 - 1;
-    [SerializeField] private float stageEndTimer;
-    public int NumberofPlayers;
+    [SerializeField] private float stageEndTimer = 20f;
+
 
     private float timer;
     private bool stageEnding = false;
     private int puzzlesToBeSolved = 0;
+    private int puzzlesSolved = 0;
     private int currentStageNumber = 0;
     private bool isSingleplayer = false;
     private int stageFloorType;
@@ -27,6 +37,7 @@ public class GameManager : MonoBehaviour
     [ServerCallback]
     public void Awake()
     {
+        gameMan = this;
         if( SceneManager.GetActiveScene().name == "Singleplayer")
         {
             isSingleplayer = true;
@@ -49,32 +60,85 @@ public class GameManager : MonoBehaviour
         if (stageEnding)
         {
             timer -= Time.deltaTime;
+            RpcEndingUpdate(timer);
             if(timer < 0)
             {
-                StartNewFloor();
+                foreach(GameObject doorButton in doorButtons)
+                {
+                    GetComponent<DoorButton>().Close();
+                }
+                StartNewStage();
                 stageEnding = false;
                 timer = stageEndTimer;
             }
         }
     }
-    #region MultStartcode
+
+    [Server]
+    public void PuzzleComplete(int puzzlesCompleted)
+    {
+        puzzlesSolved += puzzlesCompleted;
+        if (puzzlesSolved >= puzzlesToBeSolved)
+        {
+            stageEnding = true;
+            RpcEndingUpdate(timer);
+        }
+        RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
+    }
+    [ClientRpc]
+    private void RpcUpdatePuzzleUI(int puzzles, int totalPuzzles)
+    {
+        gameUI.puzzleText.text = ("Puzzles Completed: " + puzzles + "/" + totalPuzzles);
+    }
+    [ClientRpc]
+    private void RpcEndingUpdate(float time)
+    {
+        gameUI.endingText.enabled = true;
+        gameUI.endingText.text = ("GET BACK TO THE CENTER \n TIMER: " + Mathf.Round(time));
+    }
+    [ClientRpc]
+    private void RpcStageUpdate()
+    {
+        gameUI.stageText.text = ("Stage: " + currentStageNumber);
+    }
+
+
+
+    #region StageStartingOrEndingCode
+    // Ran Once when GAme first Loaded 0
     [Server]
     public void StartGame()
     {
         gameScale = 1;
-        gameScaling += gameScaling * NumberofPlayers;
+        gameScale += gameScaling;
         currentStageNumber = 0;
         BuildMap();
     }
+
+
+    // Ran at end of stage building 5
     [Server]
     public void StartStage()
     {
-        // allows players to see and move
+        foreach(NetworkConnection playerConn in playerConnections)
+        {
+            TgtAllowPlayer(playerConn);
+        }
         currentStageNumber += 1;
+        RpcStageUpdate();
     }
+
+    //Ran When Previous Stage Ended 6
     [Server]
-    public void StartNewFloor()
+    public void StartNewStage()
     {
+        int ii = 0;
+        foreach(NetworkConnection plyrConn in playerConnections)
+        {
+            TgtAllowPlayer(plyrConn);
+            TgtPlayerMoveSpawn(plyrConn, ii);
+                ii++;
+        }
         gameScale += gameScaling;
         foreach(Pathway pathway in allStagePathways)
         {
@@ -90,17 +154,35 @@ public class GameManager : MonoBehaviour
         }
         BuildMap();
     }
-    [Server]
-    public void PuzzleComplete(int puzzlesCompleted)
+
+    [TargetRpc]
+    private void TgtAllowPlayer(NetworkConnection conn)
     {
-        puzzlesToBeSolved -= puzzlesCompleted;
-        if(puzzlesToBeSolved == 0)
+        foreach(NetworkIdentity clientObject in conn.clientOwnedObjects)
         {
-            stageEnding = true;
+            if(clientObject.gameObject.tag == "Player")
+            {
+                clientObject.gameObject.GetComponent<PlayerMVE>().SeeMove();
+            }
+            
+        }
+    }
+    [TargetRpc]
+    private void TgtPlayerMoveSpawn(NetworkConnection conn, int playerNumber)
+    {
+        foreach (NetworkIdentity clientObject in conn.clientOwnedObjects)
+        {
+            if (clientObject.gameObject.tag == "Player")
+            {
+                clientObject.gameObject.transform.position = spawnPositions[playerNumber].position;
+            }
+
         }
     }
     #endregion
-    #region StageBuild
+
+    #region BuildingOfStage
+    //Place Floor Objects for Every Object 1
     [Server]
     public void BuildMap()
     {
@@ -130,6 +212,7 @@ public class GameManager : MonoBehaviour
         }
         StartStage();
     }
+    //Picks random object to place and snaps it to random open space. 2
     [Server]
     public void PlaceFloorObjects(int partsPerSection, Pathway pathComponent)
     {
@@ -170,27 +253,15 @@ public class GameManager : MonoBehaviour
         }
         PlacePuzzles();
     }
+    //Places an ending to open spaces 2.5
     [Server]
     public void PlaceEndCap(Pathway EndPath, int direction)
     {
-        GameObject EndCap =Instantiate(FloorList.floorList.EndCap(stageFloorType), new Vector3(-1000, -1000, -1000), Quaternion.identity);
+        GameObject EndCap = Instantiate(FloorList.floorList.EndCap(stageFloorType), new Vector3(-1000, -1000, -1000), Quaternion.identity);
         NetworkServer.Spawn(EndCap);
         // Attatch to EndPath
     }
-    [Server]
-    public void MonsterSpawn()
-    {
-        int amountOfMonster = 1 + Mathf.FloorToInt((currentStageNumber * NumberofPlayers)/ 3);
-        for(int i = 0; i < amountOfMonster; i++)
-        {
-            GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];
-            GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count + 1)].monsterSpawnPosition, Quaternion.identity);
-            NetworkServer.Spawn(spawnedMonster);
-        }
-
-    }
-    #endregion
-    #region PuzzlePlace
+    // Places random Puzzles in places 3
     [Server]
     public void PlacePuzzles()
     {
@@ -207,10 +278,29 @@ public class GameManager : MonoBehaviour
             NetworkServer.Spawn(puzzle);
             puzzle.transform.position = Vector3.zero;
             puzzle.transform.rotation = randomPuzzlePoint.rotation;
-            
+
         }
-        
+        MonsterSpawn();
     }
+    // Spawns in Monsters 4
+    [Server]
+    public void MonsterSpawn()
+    {
+        int amountOfMonster = 1 + Mathf.FloorToInt((currentStageNumber * NumberofPlayers) / 3);
+        for (int i = 0; i < amountOfMonster; i++)
+        {
+            GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];
+            GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count + 1)].monsterSpawnPosition, Quaternion.identity);
+            NetworkServer.Spawn(spawnedMonster);
+        }
+        StartStage();
+    }
+
+    #endregion
+
+    //If more then one puzzle
+    #region PuzzlePlace
+
 
     // For extraPuzzles
     float FourProb;

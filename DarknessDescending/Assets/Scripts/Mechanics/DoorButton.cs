@@ -19,23 +19,33 @@ public class DoorButton : Interactable
         base.Interacted();
         if (isOpen)
         {
-            while (door.transform.position.y > doorOpenPos.y)
-            {
-                Vector3 transfer = door.transform.position;
-                transfer.y -= (.05f * CloseSpeed);
-                door.transform.position = transfer;
-            }
-            isOpen = false;
+            Close();
         }
         else
         {
-            while(door.transform.position.y < doorClosePos.y)
-            {
-                Vector3 transfer = door.transform.position;
-                transfer.y += (.05f * OpenSpeed);
-                door.transform.position = transfer;
-            }
-            isOpen = true;
+            Open();
         }
+    }
+    [Server]
+    public void Open()
+    {
+        while (door.transform.position.y > doorOpenPos.y)
+        {
+            Vector3 transfer = door.transform.position;
+            transfer.y -= (.05f * CloseSpeed);
+            door.transform.position = transfer;
+        }
+        isOpen = true;
+    }
+    [Server]
+    public void Close()
+    {
+        while (door.transform.position.y < doorClosePos.y)
+        {
+            Vector3 transfer = door.transform.position;
+            transfer.y += (.05f * OpenSpeed);
+            door.transform.position = transfer;
+        }
+        isOpen = false;
     }
 }

@@ -9,6 +9,7 @@ public class Pathway : MonoBehaviour
     public int orientaion; // 0 original 1 rotate to the right 90// 2 rotate 180 3 rotate 270
     public bool isConnected;
     public Vector3 monsterSpawnPosition;
+    public List<GameObject> navObjects = new List<GameObject>();
 
     private bool hittingOtherPath = false;
     public List<GameObject> puzzlePoints = new List<GameObject>();

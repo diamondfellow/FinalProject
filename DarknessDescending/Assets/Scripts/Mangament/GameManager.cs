@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using UnityEngine.SceneManagement;
+using UnityEngine.AI;
 //using System;
 
 public class GameManager : NetworkBehaviour
@@ -19,6 +19,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private Pathway LeftStart;
     [SerializeField] private Transform[] spawnPositions = new Transform[4];
     [SerializeField] private GameObject[] doorButtons = new GameObject[4];
+    [SerializeField] private NavMeshSurface hubFloor;
 
     [SerializeField] private float gameScaling = .1f; //Amount per stage increase in percent .1 - 1;
     [SerializeField] private float stageEndTimer = 20f;
@@ -29,7 +30,6 @@ public class GameManager : NetworkBehaviour
     private int puzzlesToBeSolved = 0;
     private int puzzlesSolved = 0;
     private int currentStageNumber = 0;
-    private bool isSingleplayer = false;
     private int stageFloorType;
     private List<Pathway> allStagePathways = new List<Pathway>();
     private float gameScale;
@@ -38,20 +38,13 @@ public class GameManager : NetworkBehaviour
     public void Awake()
     {
         gameMan = this;
-        if( SceneManager.GetActiveScene().name == "Singleplayer")
-        {
-            isSingleplayer = true;
-        }
-        else
-        {
-            isSingleplayer = false;
-        }
         gameScale = 1;
         timer = stageEndTimer;
     }
     [ServerCallback]
     public void Start()
     {
+        hubFloor.collectObjects = CollectObjects.Children;
         StartGame();
     }
     [ServerCallback]
@@ -94,7 +87,7 @@ public class GameManager : NetworkBehaviour
     private void RpcEndingUpdate(float time)
     {
         gameUI.endingText.enabled = true;
-        gameUI.endingText.text = ("GET BACK TO THE CENTER \n TIMER: " + Mathf.Round(time));
+        gameUI.endingText.text = ("GET BACK TO THE CENTER \n TIME LEFT: " + Mathf.Round(time));
     }
     [ClientRpc]
     private void RpcStageUpdate()
@@ -145,6 +138,7 @@ public class GameManager : NetworkBehaviour
             Destroy(pathway.gameObject);
             NetworkServer.Destroy(pathway.gameObject);
         }
+        //hubFloor.navMeshData 
         foreach (GameObject basePathway in GameObject.FindGameObjectsWithTag("Pathway"))
         {
             for(int i = 0; i > 4; i++) 
@@ -280,9 +274,17 @@ public class GameManager : NetworkBehaviour
             puzzle.transform.rotation = randomPuzzlePoint.rotation;
 
         }
+        GenerateNavMesh();
+    }
+    // Generates Nav mesh for enemies
+    [Server]
+    public void GenerateNavMesh()
+    {
+        
+        hubFloor.BuildNavMesh();
         MonsterSpawn();
     }
-    // Spawns in Monsters 4
+    // Spawns in Monsters 5
     [Server]
     public void MonsterSpawn()
     {
@@ -302,7 +304,7 @@ public class GameManager : NetworkBehaviour
     #region PuzzlePlace
 
 
-    // For extraPuzzles
+    /* For extraPuzzles
     float FourProb;
     float threeProb;
     float twoProb;
@@ -337,6 +339,7 @@ public class GameManager : NetworkBehaviour
 
         }
     }
+    */
     #endregion
     // \/ Deprecated
     #region SinglePlayer

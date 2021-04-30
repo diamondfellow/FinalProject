@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 public class PlayerDeath : NetworkBehaviour
 {
+    public bool isDead = false;
     [ServerCallback]
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -12,12 +13,13 @@ public class PlayerDeath : NetworkBehaviour
             gameObject.GetComponent<MeshRenderer>().enabled = false;
             gameObject.GetComponent<CapsuleCollider>().enabled = false;
             gameObject.GetComponent<Rigidbody>().useGravity = false;
-            ClntKillPlayer();
+            isDead = true;
+            RpcKillPlayer();
             
         }
     }
     [ClientRpc]
-    private void ClntKillPlayer()
+    private void RpcKillPlayer()
     {
         gameObject.GetComponent<Rigidbody>().useGravity = false;
         gameObject.GetComponent<MeshRenderer>().enabled = false;

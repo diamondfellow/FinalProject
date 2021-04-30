@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class PlayerMVE : NetworkBehaviour
+public class PlayerMVE : MonoBehaviour
 {
     public bool canMove = false;
     public bool spectate = false;
@@ -15,6 +15,7 @@ public class PlayerMVE : NetworkBehaviour
     [SerializeField] private Canvas loadingCanvas;
     private void Awake()
     {
+        /*
         if (!hasAuthority)
         {
             for(int i = 0; i < transform.childCount; i++)
@@ -23,15 +24,16 @@ public class PlayerMVE : NetworkBehaviour
                 NetworkServer.Destroy(transform.GetChild(i).gameObject);
             }
         }
+        */
         mainCam = Camera.main;
     }
     //[ClientCallback]
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
-        if(!hasAuthority) { return; }
+        #region lookcode
+        //if (!hasAuthority) { return; }
         //Left to right Camera
-        Debug.Log("e");
         Vector3 playerRotation = gameObject.transform.rotation.eulerAngles;
         playerRotation.y += (lookSpeed * Input.GetAxis("Mouse X") * Time.deltaTime);
         Quaternion transfer = Quaternion.Euler(playerRotation);
@@ -49,13 +51,23 @@ public class PlayerMVE : NetworkBehaviour
         }      
         Quaternion transferUpDown = Quaternion.Euler(cameraRotation);
         mainCam.transform.rotation = transferUpDown;
+        #endregion
+        float horiInput = Input.GetAxis("Horizontal");
+        float vertInput = Input.GetAxis("Vertical");
+        Vector3 lookingAt = gameObject.transform.forward * vertInput;
+        Vector3 lookingStrafe = gameObject.transform.right * horiInput;
+        if (!spectate)
+        {
+            lookingStrafe = new Vector3(lookingStrafe.x, 0, lookingStrafe.z);
+            lookingAt = new Vector3(lookingAt.x, 0, lookingAt.z);
+        }
         if (spectate)
         {
-
+            gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
         else if (canMove)
         {
-            //movement 
+            gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
     }
     [Client]

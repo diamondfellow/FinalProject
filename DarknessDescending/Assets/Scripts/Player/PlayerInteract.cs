@@ -17,8 +17,8 @@ public class PlayerInteract : NetworkBehaviour
             RaycastHit hit;
             if(Physics.Raycast(CameraRay, out hit))
             {
-                Interactable objectInteract;
-                if (hit.collider.transform.gameObject.TryGetComponent<Interactable>(out objectInteract))
+                Interactables objectInteract;
+                if (hit.collider.transform.gameObject.TryGetComponent<Interactables>(out objectInteract))
                 {
                     Interact(objectInteract);
                 }
@@ -48,7 +48,7 @@ public class PlayerInteract : NetworkBehaviour
     #endregion
 
     [Command]
-    private void Interact(Interactable objectToInteract)
+    private void Interact(Interactables objectToInteract)
     {
         objectToInteract.Interacted();
     }

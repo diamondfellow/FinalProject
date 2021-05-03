@@ -10,7 +10,7 @@ public class GameManager : NetworkBehaviour
     public static GameManager gameMan;
 
     public int NumberofPlayers;
-    public List<NetworkConnection> playerConnections = new List<NetworkConnection>();
+    
 
     [SerializeField] private GameUI gameUI;
     [SerializeField] private Pathway UpStart;
@@ -50,6 +50,7 @@ public class GameManager : NetworkBehaviour
     [ServerCallback]
     public void Update()
     {
+        NumberofPlayers = 
         if (stageEnding)
         {
             timer -= Time.deltaTime;
@@ -113,7 +114,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void StartStage()
     {
-        foreach(NetworkConnection playerConn in playerConnections)
+        foreach(PlayerMVE player in NetworkManager.singleton.
         {
             TgtAllowPlayer(playerConn);
         }
@@ -138,6 +139,7 @@ public class GameManager : NetworkBehaviour
             Destroy(pathway.gameObject);
             NetworkServer.Destroy(pathway.gameObject);
         }
+        allStagePathways.Clear();
         //hubFloor.navMeshData 
         foreach (GameObject basePathway in GameObject.FindGameObjectsWithTag("Pathway"))
         {

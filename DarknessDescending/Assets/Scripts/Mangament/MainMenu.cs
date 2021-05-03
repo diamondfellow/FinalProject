@@ -1,10 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;   
+using UnityEngine.UI;
+using Mirror;
 
 public class MainMenu : MonoBehaviour
 {
+    [SerializeField] private GameObject mainMenu;
+    [SerializeField] private GameObject lobbyUI;
+    [SerializeField] private GameObject addressUI;
+    [SerializeField] private InputField addressInput;
+    [SerializeField] private Button joinButton;
+
     public void Quit()
     {
         Application.Quit();
@@ -13,16 +20,15 @@ public class MainMenu : MonoBehaviour
     {
 
     }
-    public void StartSinglePlayer()
+    public void HostLobby()
     {
-
-    }
-    public void StartLobby()
-    {
-
+        mainMenu.SetActive(false);
+        NetworkManager.singleton.StartHost();
     }
     public void JoinLobby()
     {
-
+        mainMenu.SetActive(false);
+        addressUI.SetActive(true);
     }
+  
 }

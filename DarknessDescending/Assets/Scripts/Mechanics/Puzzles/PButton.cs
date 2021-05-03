@@ -4,7 +4,7 @@ using UnityEngine;
 using Mirror;
 using System;
 
-public class Button : Puzzle
+public class PButton : Puzzle
 {
     public Color onColor;
     [Server]

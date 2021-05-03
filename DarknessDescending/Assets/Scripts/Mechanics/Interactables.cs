@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Mirror;
 
-public class Interactable : NetworkBehaviour
+public class Interactables : NetworkBehaviour
 {
     public GameManager gameMangaer;
     [ClientCallback]
@@ -14,6 +15,6 @@ public class Interactable : NetworkBehaviour
     [Server]
     public virtual void Interacted()
     {
-
+        
     }
 }

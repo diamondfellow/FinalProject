@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class DoorButton : Interactable
+public class DoorButton : Interactables
 {
     [SerializeField] private GameObject door;
     [SerializeField] private Vector3 doorOpenPos;

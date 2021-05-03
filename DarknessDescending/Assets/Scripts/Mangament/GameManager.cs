@@ -50,7 +50,7 @@ public class GameManager : NetworkBehaviour
     [ServerCallback]
     public void Update()
     {
-        NumberofPlayers = 
+        //NumberofPlayers = 
         if (stageEnding)
         {
             timer -= Time.deltaTime;
@@ -114,9 +114,9 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void StartStage()
     {
-        foreach(PlayerMVE player in NetworkManager.singleton.
+        foreach (NetworkConnection conn in NetworkMan.Players)
         {
-            TgtAllowPlayer(playerConn);
+            TgtAllowPlayer(conn);
         }
         currentStageNumber += 1;
         RpcStageUpdate();
@@ -127,11 +127,11 @@ public class GameManager : NetworkBehaviour
     public void StartNewStage()
     {
         int ii = 0;
-        foreach(NetworkConnection plyrConn in playerConnections)
+        foreach(NetworkConnection plyrConn in NetworkMan.Players)
         {
             TgtAllowPlayer(plyrConn);
             TgtPlayerMoveSpawn(plyrConn, ii);
-                ii++;
+            ii++;
         }
         gameScale += gameScaling;
         foreach(Pathway pathway in allStagePathways)
@@ -140,7 +140,6 @@ public class GameManager : NetworkBehaviour
             NetworkServer.Destroy(pathway.gameObject);
         }
         allStagePathways.Clear();
-        //hubFloor.navMeshData 
         foreach (GameObject basePathway in GameObject.FindGameObjectsWithTag("Pathway"))
         {
             for(int i = 0; i > 4; i++) 
@@ -152,28 +151,18 @@ public class GameManager : NetworkBehaviour
     }
 
     [TargetRpc]
-    private void TgtAllowPlayer(NetworkConnection conn)
+    private void TgtAllowPlayer(NetworkConnection player)
     {
-        foreach(NetworkIdentity clientObject in conn.clientOwnedObjects)
-        {
-            if(clientObject.gameObject.tag == "Player")
-            {
-                clientObject.gameObject.GetComponent<PlayerMVE>().SeeMove();
-            }
-            
-        }
+        player.identity.gameObject.GetComponent<PlayerMVE>().SeeMove();
     }
     [TargetRpc]
     private void TgtPlayerMoveSpawn(NetworkConnection conn, int playerNumber)
     {
-        foreach (NetworkIdentity clientObject in conn.clientOwnedObjects)
-        {
-            if (clientObject.gameObject.tag == "Player")
-            {
-                clientObject.gameObject.transform.position = spawnPositions[playerNumber].position;
-            }
 
-        }
+         conn.identity.gameObject.transform.position = spawnPositions[playerNumber].position;
+            
+
+        
     }
     #endregion
 

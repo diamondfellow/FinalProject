@@ -9,16 +9,27 @@ public class NetworkMan : NetworkManager
 {
     public static event Action ClientOnConnected;
     public static event Action ClientOnDisConnected;
-    public List<PlayerMVE> Players  = new List<PlayerMVE>();
+    public static event Action IsHost;
+    public static List<NetworkConnection> Players  = new List<NetworkConnection>();
 
     private bool isGameProgress = false;
     public override void OnServerConnect(NetworkConnection conn)
     {
-
-        if (isGameProgress || numPlayers > 4)
+        Players.Add(conn);
+        if (Players.Count == 1)
+        {
+            IsHost?.Invoke();
+        }
+        if (isGameProgress)
         {
             conn.Disconnect();
         }
+    }
+    public override void OnServerDisconnect(NetworkConnection conn)
+    {
+        base.OnServerDisconnect(conn);
+
+        Players.Remove(conn);
     }
     public override void OnStopServer()
     {
@@ -45,21 +56,21 @@ public class NetworkMan : NetworkManager
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
         base.OnServerAddPlayer(conn);
-        PlayerMVE player = conn.identity.GetComponent<PlayerMVE>();
-
-        Players.Add(player);
-    }
-    public override void OnServerDisconnect(NetworkConnection conn)
-    {
-        base.OnServerDisconnect(conn);
-        PlayerMVE player = conn.identity.GetComponent<PlayerMVE>();
-        Players.Remove(player);
+        
     }
     public override void OnServerChangeScene(string newSceneName)
     {
         if(SceneManager.GetActiveScene().name == "Multiplayer")
         {
+            foreach(NetworkConnection conn in Players)
+            {
+                Transform startPos = GetStartPosition();
+                GameObject player = startPos != null
+                    ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
+                    : Instantiate(playerPrefab);
 
+                NetworkServer.AddPlayerForConnection(conn, player);
+            }
         }
     }
 }

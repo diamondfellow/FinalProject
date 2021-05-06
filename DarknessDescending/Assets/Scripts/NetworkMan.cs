@@ -12,7 +12,12 @@ public class NetworkMan : NetworkManager
     public static event Action IsHost;
     public static List<NetworkConnection> Players  = new List<NetworkConnection>();
 
+    public GameObject lobbyPlayer;
+
+    private string[] orderedPlayerNames = new string[4];
     private bool isGameProgress = false;
+
+
     public override void OnServerConnect(NetworkConnection conn)
     {
         Players.Add(conn);
@@ -28,7 +33,6 @@ public class NetworkMan : NetworkManager
     public override void OnServerDisconnect(NetworkConnection conn)
     {
         base.OnServerDisconnect(conn);
-
         Players.Remove(conn);
     }
     public override void OnStopServer()
@@ -40,8 +44,8 @@ public class NetworkMan : NetworkManager
     public void StartGame()
     {
         isGameProgress = true;
-
         ServerChangeScene("Multiplayer");
+        Debug.Log(Players.Count);
     }
     public override void OnClientConnect(NetworkConnection conn)
     {
@@ -55,22 +59,23 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        base.OnServerAddPlayer(conn);
+        if(SceneManager.GetActiveScene().name == "Multiplayer")
+        {
+            base.OnServerAddPlayer(conn);
+        }
+        else
+        {
+            Transform startPos = GetStartPosition();
+            GameObject player = startPos != null
+                ? Instantiate(lobbyPlayer, startPos.position, startPos.rotation)
+                : Instantiate(lobbyPlayer);
+
+            NetworkServer.AddPlayerForConnection(conn, player);
+        }
+
         
     }
     public override void OnServerChangeScene(string newSceneName)
     {
-        if(SceneManager.GetActiveScene().name == "Multiplayer")
-        {
-            foreach(NetworkConnection conn in Players)
-            {
-                Transform startPos = GetStartPosition();
-                GameObject player = startPos != null
-                    ? Instantiate(playerPrefab, startPos.position, startPos.rotation)
-                    : Instantiate(playerPrefab);
-
-                NetworkServer.AddPlayerForConnection(conn, player);
-            }
-        }
     }
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 public class PlayerDeath : NetworkBehaviour
 {
+    // DEPACATED No USE
     public bool isDead = false;
     [ServerCallback]
     private void OnTriggerEnter2D(Collider2D collision)

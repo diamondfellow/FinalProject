@@ -3,34 +3,49 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
-public class PlayerMVE : MonoBehaviour
+public class Player : NetworkBehaviour
 {
+    [SerializeField] private float interactDistance;
+    [SerializeField] private Light headlamp;
+
     public bool canMove = false;
     public bool spectate = false;
-    
+    public bool isDead = false;
 
     private Camera mainCam;
     [SerializeField] private float lookSpeed;
     [SerializeField] private float moveSpeed;
     [SerializeField] private Canvas loadingCanvas;
+
     private void Awake()
     {
-        /*
-        if (!hasAuthority)
-        {
-            for(int i = 0; i < transform.childCount; i++)
-            {
-                Destroy( transform.GetChild(i).gameObject);
-                NetworkServer.Destroy(transform.GetChild(i).gameObject);
-            }
-        }
-        */
         mainCam = Camera.main;
+        
     }
-    //[ClientCallback]
-    // Update is called once per frame
+    [ClientCallback]
     private void Update()
     {
+        if (!hasAuthority) { return; }
+        #region Interact
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            Ray CameraRay = Camera.main.ScreenPointToRay(new Vector2(Screen.width / 2, Screen.height / 2));
+            RaycastHit hit;
+            if (Physics.Raycast(CameraRay, out hit))
+            {
+                Interactables objectInteract;
+                if (hit.collider.transform.gameObject.TryGetComponent<Interactables>(out objectInteract))
+                {
+                    Interact(objectInteract);
+                }
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            headlamp.enabled = !headlamp.enabled;
+            CmdFlashligt();
+        }
+        #endregion
         #region lookcode
         //if (!hasAuthority) { return; }
         //Left to right Camera
@@ -52,6 +67,7 @@ public class PlayerMVE : MonoBehaviour
         Quaternion transferUpDown = Quaternion.Euler(cameraRotation);
         mainCam.transform.rotation = transferUpDown;
         #endregion
+        #region Move
         float horiInput = Input.GetAxis("Horizontal");
         float vertInput = Input.GetAxis("Vertical");
         Vector3 lookingAt = gameObject.transform.forward * vertInput;
@@ -69,6 +85,7 @@ public class PlayerMVE : MonoBehaviour
         {
             gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
+        #endregion
     }
     [Client]
     public void SeeMove()
@@ -76,4 +93,52 @@ public class PlayerMVE : MonoBehaviour
         loadingCanvas.enabled = !loadingCanvas.enabled;
         canMove = !canMove;
     }
+    [Command]
+    private void Interact(Interactables objectToInteract)
+    {
+        objectToInteract.Interacted();
+    }
+
+    #region DeathCode
+
+    [ServerCallback]
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == ("Monster"))
+        {
+            gameObject.GetComponent<MeshRenderer>().enabled = false;
+            gameObject.GetComponent<CapsuleCollider>().enabled = false;
+            gameObject.GetComponent<Rigidbody>().useGravity = false;
+            isDead = true;
+            RpcKillPlayer();
+
+        }
+    }
+    [ClientRpc]
+    private void RpcKillPlayer()
+    {
+        gameObject.GetComponent<Rigidbody>().useGravity = false;
+        gameObject.GetComponent<MeshRenderer>().enabled = false;
+        gameObject.GetComponent<CapsuleCollider>().enabled = false;
+    }
+    #endregion
+    #region FlashLight
+    [Command]
+    private void CmdFlashligt()
+    {
+        SvrFlashlight();
+    }
+    [Server]
+    private void SvrFlashlight()
+    {
+        ClntFlashlight();
+    }
+    [ClientRpc]
+    private void ClntFlashlight()
+    {
+        headlamp.enabled = !headlamp.enabled;
+    }
+    #endregion
+
+
 }

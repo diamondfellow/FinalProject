@@ -5,6 +5,7 @@ using Mirror;
 
 public class PlayerInteract : NetworkBehaviour
 {
+    // DEPACATED No USE
     [SerializeField ]private float interactDistance;
     [SerializeField] private Light headlamp;
     [ClientCallback]

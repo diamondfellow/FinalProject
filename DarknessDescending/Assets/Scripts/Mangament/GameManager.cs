@@ -153,7 +153,7 @@ public class GameManager : NetworkBehaviour
     [TargetRpc]
     private void TgtAllowPlayer(NetworkConnection player)
     {
-        player.identity.gameObject.GetComponent<PlayerMVE>().SeeMove();
+        player.identity.gameObject.GetComponent<Player>().SeeMove();
     }
     [TargetRpc]
     private void TgtPlayerMoveSpawn(NetworkConnection conn, int playerNumber)

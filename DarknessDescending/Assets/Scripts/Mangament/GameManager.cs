@@ -13,8 +13,8 @@ public class GameManager : NetworkBehaviour
     
 
     [SerializeField] private GameUI gameUI;
-    [SerializeField] private Pathway UpStart;
-    [SerializeField] private Pathway DownStart;
+    [SerializeField] private Pathway FrontStart;
+    [SerializeField] private Pathway BackStart;
     [SerializeField] private Pathway RightStart;
     [SerializeField] private Pathway LeftStart;
     [SerializeField] private Transform[] spawnPositions = new Transform[4];
@@ -175,25 +175,22 @@ public class GameManager : NetworkBehaviour
         partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale * NumberofPlayers);
         stageFloorType = Random.Range(0, (FloorList.floorList.numberOfFloorTypes + 1));
         for (int o = 0; o <= 3; o++)
-        {
-            for (int i = 0; i <= partsPerSection; i++)
-            {
-                switch (o)
-                {
+        {       
+              switch (o)
+              {
                     case 0:
-                        PlaceFloorObjects(partsPerSection, UpStart);
+                        PlaceFloorObjects(partsPerSection, FrontStart);
                         break;
                     case 1:
                         PlaceFloorObjects(partsPerSection, RightStart);
                         break;
                     case 2:
-                        PlaceFloorObjects(partsPerSection, DownStart);
+                        PlaceFloorObjects(partsPerSection, BackStart);
                         break;
                     case 3:
                         PlaceFloorObjects(partsPerSection, LeftStart);
                         break;
-                }
-            }
+              }          
         }
         StartStage();
     }
@@ -201,34 +198,34 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void PlaceFloorObjects(int partsPerSection, Pathway pathComponent)
     {
-        List<Pathway> currentSectionPathways = new List<Pathway>();
+        List<Pathway> currentStartSectionPathways = new List<Pathway>();
 
-        currentSectionPathways.Add(pathComponent);
+        currentStartSectionPathways.Add(pathComponent);
         for (int i = 0; i < partsPerSection; i++)
         {
-            Pathway nextPlacement = currentSectionPathways[Random.Range(0, (currentSectionPathways.Count + 1))];
+            Pathway nextPlacement = currentStartSectionPathways[Random.Range(0, (currentStartSectionPathways.Count + 1))];
             GameObject NewestObject = Instantiate(FloorList.floorList.RandomFloorType(stageFloorType), nextPlacement.gameObject.transform);
             NetworkServer.Spawn(NewestObject);
             //NewestObject.transform.position = 
             if (NewestObject.GetComponent<Pathway>().IsHitting())
             {
                 PlaceEndCap(nextPlacement, -1);
-                currentSectionPathways.Remove(nextPlacement);
+                currentStartSectionPathways.Remove(nextPlacement);
                 Destroy(NewestObject);
                 NetworkServer.Destroy(NewestObject);
             }
             else
             {
-                currentSectionPathways.Add(NewestObject.GetComponent<Pathway>());
+                currentStartSectionPathways.Add(NewestObject.GetComponent<Pathway>());
                 allStagePathways.Add(NewestObject.GetComponent<Pathway>());
             }
             if (!nextPlacement.IsOpen())
             {
-                currentSectionPathways.Remove(nextPlacement);
+                currentStartSectionPathways.Remove(nextPlacement);
             }
 
         }
-        foreach (Pathway openPath in currentSectionPathways)
+        foreach (Pathway openPath in currentStartSectionPathways)
         {
             List<int> transfer = openPath.FindOpens();
             for (int i = 0; i < transfer.Count; i++)
@@ -283,8 +280,8 @@ public class GameManager : NetworkBehaviour
         for (int i = 0; i < amountOfMonster; i++)
         {
             GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];
-            GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count + 1)].monsterSpawnPosition, Quaternion.identity);
-            NetworkServer.Spawn(spawnedMonster);
+            //GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count + 1)].monsterSpawnPosition, Quaternion.identity);
+            //NetworkServer.Spawn(spawnedMonster);
         }
         StartStage();
     }
@@ -348,13 +345,13 @@ public class GameManager : NetworkBehaviour
                 switch (o)
                 {
                     case 0:
-                        PlaceFloorObjects(partsPerSection, UpStart);
+                        PlaceFloorObjects(partsPerSection, FrontStart);
                         break;
                     case 1:
                         PlaceFloorObjects(partsPerSection, RightStart);
                         break;
                     case 2:
-                        PlaceFloorObjects(partsPerSection, DownStart);
+                        PlaceFloorObjects(partsPerSection, BackStart);
                         break;
                     case 3:
                         PlaceFloorObjects(partsPerSection, LeftStart);

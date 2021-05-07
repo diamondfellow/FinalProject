@@ -6,7 +6,7 @@ using Mirror;
 
 public class Interactables : NetworkBehaviour
 {
-    public GameManager gameMangaer;
+    [HideInInspector] public GameManager gameMangaer;
     [ClientCallback]
     public void Awake()
     {

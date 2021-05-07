@@ -77,5 +77,6 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerChangeScene(string newSceneName)
     {
+
     }
 }

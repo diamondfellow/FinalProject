@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class Pathway : MonoBehaviour
 {
-    public bool[] openPaths = new bool[4]; // 0 up 1 right 2 down 3 left
-    public Vector3[] connectionPoints = new Vector3[4];
+    public bool[] openPaths = new bool[4]; // 0 Front 1 right 2 Back 3 left
+    public Transform[] connectionPoints = new Transform[4];
     public int orientaion; // 0 original 1 rotate to the right 90// 2 rotate 180 3 rotate 270
     public bool isConnected;
-    public Vector3 monsterSpawnPosition;
-    public List<GameObject> navObjects = new List<GameObject>();
+    public Transform monsterSpawnPosition;
+    //public List<GameObject> navObjects = new List<GameObject>();
 
     private bool hittingOtherPath = false;
     public List<GameObject> puzzlePoints = new List<GameObject>();

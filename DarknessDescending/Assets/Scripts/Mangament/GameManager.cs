@@ -206,7 +206,18 @@ public class GameManager : NetworkBehaviour
             Pathway nextPlacement = currentStartSectionPathways[Random.Range(0, (currentStartSectionPathways.Count + 1))];
             GameObject NewestObject = Instantiate(FloorList.floorList.RandomFloorType(stageFloorType), nextPlacement.gameObject.transform);
             NetworkServer.Spawn(NewestObject);
-            //NewestObject.transform.position = 
+            //Random Point of object to link to
+            List<int> holder = nextPlacement.FindOpens();
+            int nextPlaceCPNumber = Random.Range(0, holder.Count + 1);
+            Vector3 newObjectConnectionPoint = nextPlacement.connectionPoints[nextPlaceCPNumber].position;
+            
+            
+            // Random Connec point of new path
+            List<int> holder2 = NewestObject.GetComponent<Pathway>().FindOpens();
+            //Vector3 newObjectConnectionPoint = NewestObject.GetComponent<Pathway>().connectionPoints[Random.Range(0, holder.Count + 1)].position;
+
+
+            //westObject.transform.position = 
             if (NewestObject.GetComponent<Pathway>().IsHitting())
             {
                 PlaceEndCap(nextPlacement, -1);

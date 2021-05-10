@@ -40,23 +40,13 @@ public class Pathway : MonoBehaviour
         }
         return false;
     }
-    public virtual void Rotate()
+    public virtual void Rotate(int desiredOrientaion)
     {
-
+        Debug.Log("SetAsPathway");
+        return;
     }
-    public virtual int FindUp()
-    {
-        return -1;
-    }
-    public virtual int FindRight()
-    {
-        return -1;
-    }
-    public virtual int FindDown()
-    {
-        return -1;
-    }
-    public virtual int FindLeft()
+    //Connection Point to Connect to from next placement
+    public virtual int FindConnectPoint(int pointToConnectTo)
     {
         return -1;
     }

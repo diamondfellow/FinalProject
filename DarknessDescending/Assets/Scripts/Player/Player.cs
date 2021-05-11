@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour
     {
         if (!hasAuthority) { return; }
         #region Interact
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyUp(KeyCode.E))
         {
             Ray CameraRay = Camera.main.ScreenPointToRay(new Vector2(Screen.width / 2, Screen.height / 2));
             RaycastHit hit;

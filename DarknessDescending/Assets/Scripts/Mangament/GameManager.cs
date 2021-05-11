@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.AI;
-//using System;
 
 public class GameManager : NetworkBehaviour
 {
@@ -25,6 +24,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private float stageEndTimer = 20f;
 
 
+    private LayerMask roomLayerMask;
     private float timer;
     private bool stageEnding = false;
     private int puzzlesToBeSolved = 0;
@@ -32,6 +32,7 @@ public class GameManager : NetworkBehaviour
     private int currentStageNumber = 0;
     private int stageFloorType;
     private List<Pathway> allStagePathways = new List<Pathway>();
+    private List<ConnectionPoint> sectionConnectionPoints = new List<ConnectionPoint>();
     private float gameScale;
 
     [ServerCallback]
@@ -106,7 +107,7 @@ public class GameManager : NetworkBehaviour
         gameScale = 1;
         gameScale += gameScaling;
         currentStageNumber = 0;
-        BuildMap();
+        StartCoroutine(nameof(BuildMap));
     }
 
 
@@ -140,14 +141,7 @@ public class GameManager : NetworkBehaviour
             NetworkServer.Destroy(pathway.gameObject);
         }
         allStagePathways.Clear();
-        foreach (GameObject basePathway in GameObject.FindGameObjectsWithTag("Pathway"))
-        {
-            for(int i = 0; i > 4; i++) 
-            {
-                basePathway.GetComponent<Pathway>().openPaths[i] = true;
-            }
-        }
-        BuildMap();
+        StartCoroutine(nameof(BuildMap));
     }
 
     [TargetRpc]
@@ -169,117 +163,124 @@ public class GameManager : NetworkBehaviour
     #region BuildingOfStage
     //Place Floor Objects for Every Object 1
     [Server]
-    public void BuildMap()
+    IEnumerator BuildMap()
     {
+        WaitForSeconds startup = new WaitForSeconds(1);
+        WaitForFixedUpdate interval = new WaitForFixedUpdate();
+
+        yield return startup;
+
+
         int partsPerSection = 3;
         partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale * NumberofPlayers);
-        stageFloorType = Random.Range(0, (FloorList.floorList.numberOfFloorTypes + 1));
-        for (int o = 0; o <= 3; o++)
-        {       
+        stageFloorType = Random.Range(0, (FloorList.floorList.numberOfFloorTypes));
+        for (int o = 0; o < 3; o++)
+        {
+              sectionConnectionPoints = new List<ConnectionPoint>();
               switch (o)
               {
-                    case 0:
-                        PlaceFloorObjects(partsPerSection, FrontStart);
-                        break;
+                    case 0:                   
+                    for (int i1 = 0; i1 < partsPerSection; i1++)
+                    {
+                        AddConnectionPoints(FrontStart);
+                        PlaceFloorObject();
+                        yield return interval;
+                    }
+                    break;
                     case 1:
-                        PlaceFloorObjects(partsPerSection, RightStart);
-                        break;
+                    for (int i1 = 0; i1 < partsPerSection; i1++)
+                    {
+                    }
+                    break;
                     case 2:
-                        PlaceFloorObjects(partsPerSection, BackStart);
-                        break;
+                    for (int i1 = 0; i1 < partsPerSection; i1++)
+                    {
+
+                    }
+                    break;
                     case 3:
-                        PlaceFloorObjects(partsPerSection, LeftStart);
-                        break;
+                    for (int i1 = 0; i1 < partsPerSection; i1++)
+                    {
+
+                    }
+                    break;
               }          
         }
         StartStage();
     }
     //Picks random object to place and snaps it to random open space. 2
     [Server]
-    public void PlaceFloorObjects(int partsPerSection, Pathway pathComponent)
+    public void PlaceFloorObject()
     {
-        List<Pathway> currentStartSectionPathways = new List<Pathway>();
-
-        currentStartSectionPathways.Add(pathComponent);
-        for (int i = 0; i < partsPerSection; i++)
+        if(sectionConnectionPoints.Count == 0)
         {
-            Pathway nextPlacement = currentStartSectionPathways[Random.Range(0, (currentStartSectionPathways.Count + 1))];
-            GameObject NewestObject = Instantiate(FloorList.floorList.RandomFloorType(stageFloorType), nextPlacement.gameObject.transform);
-            NetworkServer.Spawn(NewestObject);
-            //Random Point of object to link to
-            List<int> holder = nextPlacement.FindOpens();
-            int nextPlaceCPNumber = Random.Range(0, holder.Count + 1);
-            Vector3 newObjectConnectionPoint = nextPlacement.connectionPoints[nextPlaceCPNumber].position;
-            
-            
-            // Random Connec point of new path
-            List<int> holder2 = NewestObject.GetComponent<Pathway>().FindOpens();
-            //Vector3 newObjectConnectionPoint = NewestObject.GetComponent<Pathway>().connectionPoints[Random.Range(0, holder.Count + 1)].position;
-
-
-            //westObject.transform.position = 
-            if (NewestObject.GetComponent<Pathway>().IsHitting())
-            {
-                PlaceEndCap(nextPlacement, -1);
-                currentStartSectionPathways.Remove(nextPlacement);
-                Destroy(NewestObject);
-                NetworkServer.Destroy(NewestObject);
-            }
-            else
-            {
-                currentStartSectionPathways.Add(NewestObject.GetComponent<Pathway>());
-                allStagePathways.Add(NewestObject.GetComponent<Pathway>());
-            }
-            if (!nextPlacement.IsOpen())
-            {
-                currentStartSectionPathways.Remove(nextPlacement);
-            }
-
+            return;
         }
-        foreach (Pathway openPath in currentStartSectionPathways)
+        ConnectionPoint nextPointToPlace = sectionConnectionPoints[Random.Range(0, sectionConnectionPoints.Count)];
+        GameObject newPath = Instantiate(FloorList.floorList.RandomFloorObject(stageFloorType), hubFloor.gameObject.transform);
+        NetworkServer.Spawn(newPath);
+
+        ConnectionPoint newPathConnPoint = newPath.GetComponent<Pathway>().connectionPoints
+            [Random.Range(0, newPath.GetComponent<Pathway>().connectionPoints.Length)];
+
+        PositionNewPath(newPath, newPathConnPoint ,nextPointToPlace);
+        if (!NewPathOverlap())
         {
-            List<int> transfer = openPath.FindOpens();
-            for (int i = 0; i < transfer.Count; i++)
-            {
-                PlaceEndCap(openPath, transfer[i]);
-            }
+            sectionConnectionPoints.Remove(nextPointToPlace);
+            PlaceFloorObject();
+            return;
         }
-        PlacePuzzles();
+        allStagePathways.Add(newPath.GetComponent<Pathway>());
+
+        nextPointToPlace.gameObject.SetActive(false);
+        sectionConnectionPoints.Remove(nextPointToPlace);
+
+        newPathConnPoint.gameObject.SetActive(false);
+        sectionConnectionPoints.Remove(newPathConnPoint);
     }
-    //Places an ending to open spaces 2.5
     [Server]
-    public void PlaceEndCap(Pathway EndPath, int direction)
+    bool NewPathOverlap()
     {
-        GameObject EndCap = Instantiate(FloorList.floorList.EndCap(stageFloorType), new Vector3(-1000, -1000, -1000), Quaternion.identity);
-        NetworkServer.Spawn(EndCap);
-        // Attatch to EndPath
+        return false;
     }
-    // Places random Puzzles in places 3
+    [Server]
+    private void PositionNewPath(GameObject newPath, ConnectionPoint currentPoint, ConnectionPoint pointToPlace)
+    {
+        newPath.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+        Vector3 pointToPlaceEuler = pointToPlace.transform.eulerAngles;
+        Vector3 currentPointEuler = currentPoint.transform.eulerAngles;
+        float deltaAngle = Mathf.DeltaAngle(currentPointEuler, pointToPlaceEuler);
+        Quaternion currentPathTargetRotation = Quaternion.AngleAxis(deltaAngle, Vector3.up);
+        newPath.transform.rotation = currentPathTargetRotation * Quaternion.Euler(0, 180f, 0);
+    }
+    [Server]
+    private void AddConnectionPoints(Pathway pathway)
+    {
+        foreach(ConnectionPoint connpoint in pathway.connectionPoints)
+        {
+            sectionConnectionPoints.Add(connpoint);
+        }
+    }
     [Server]
     public void PlacePuzzles()
     {
+        
         puzzlesToBeSolved = 3 + (NumberofPlayers * currentStageNumber);
         List<Pathway> puzzlePathways = allStagePathways;
         for (int i = 0; i < puzzlesToBeSolved; i++)
         {
 
             Transform randomPathway = puzzlePathways[Random.Range(0, allStagePathways.Count + 1)].transform;
-            Transform randomPuzzlePoint = randomPathway.GetComponent<Pathway>().puzzlePoints
-                [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count + 1)].transform;
-            GameObject puzzle = Instantiate(PuzzleList.puzzleList.EasyPuzzles
-                [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count + 1)].gameObject, randomPuzzlePoint);
-            NetworkServer.Spawn(puzzle);
-            puzzle.transform.position = Vector3.zero;
-            puzzle.transform.rotation = randomPuzzlePoint.rotation;
+           // Transform randomPuzzlePoint = randomPathway.GetComponent<Pathway>().puzzlePoints
+             //   [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count + 1)].transform;
+            //GameObject puzzle = Instantiate(PuzzleList.puzzleList.EasyPuzzles
+              //  [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count + 1)].gameObject, randomPuzzlePoint);
+            //NetworkServer.Spawn(puzzle);
+            //puzzle.transform.position = Vector3.zero;
+            //puzzle.transform.rotation = randomPuzzlePoint.rotation;
 
         }
-        GenerateNavMesh();
-    }
-    // Generates Nav mesh for enemies
-    [Server]
-    public void GenerateNavMesh()
-    {
-        
         hubFloor.BuildNavMesh();
         MonsterSpawn();
     }
@@ -340,79 +341,4 @@ public class GameManager : NetworkBehaviour
     }
     */
     #endregion
-    // \/ Deprecated
-    #region SinglePlayer
-
-    [Server]
-    public void SinBuildMap()
-    {
-        int partsPerSection = 5;
-        partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale);
-        stageFloorType = Random.Range(0, (FloorList.floorList.numberOfFloorTypes + 1));
-        for (int o = 0; o <= 3; o++)
-        {
-            for (int i = 0; i <= partsPerSection; i++)
-            {
-                switch (o)
-                {
-                    case 0:
-                        PlaceFloorObjects(partsPerSection, FrontStart);
-                        break;
-                    case 1:
-                        PlaceFloorObjects(partsPerSection, RightStart);
-                        break;
-                    case 2:
-                        PlaceFloorObjects(partsPerSection, BackStart);
-                        break;
-                    case 3:
-                        PlaceFloorObjects(partsPerSection, LeftStart);
-                        break;
-                }
-            }
-        }
-        StartStage();
-    }
-    public void SinPlaceFloorObjects(int partsPerSection, Pathway pathComponent)
-    {
-        List<Pathway> currentSectionPathways = new List<Pathway>();
-
-        currentSectionPathways.Add(pathComponent);
-        for (int i = 0; i < partsPerSection; i++)
-        {
-            Pathway nextPlacement = currentSectionPathways[Random.Range(0, (currentSectionPathways.Count + 1))];
-            GameObject NewestObject = Instantiate(FloorList.floorList.RandomFloorType(stageFloorType), nextPlacement.transform.position, Quaternion.identity);
-            // attatch to nextPlacement
-            if (NewestObject.GetComponent<Pathway>().IsHitting())
-            {
-                PlaceEndCap(nextPlacement, -1);
-                currentSectionPathways.Remove(nextPlacement);
-                Destroy(NewestObject);
-            }
-            else
-            {
-                currentSectionPathways.Add(NewestObject.GetComponent<Pathway>());
-                allStagePathways.Add(NewestObject.GetComponent<Pathway>());
-            }
-            if (!nextPlacement.IsOpen())
-            {
-                currentSectionPathways.Remove(nextPlacement);
-            }
-
-        }
-        foreach (Pathway openPath in currentSectionPathways)
-        {
-            List<int> transfer = openPath.FindOpens();
-            for (int i = 0; i < transfer.Count; i++)
-            {
-                PlaceEndCap(openPath, transfer[i]);
-            }
-        }
-        PlacePuzzles();
-    }
-    public void SinPlaceEndCap(Pathway EndPath, int direction)
-    {
-        Instantiate(FloorList.floorList.EndCap(stageFloorType), new Vector3(-1000, -1000, -1000), Quaternion.identity);
-        // Attatch to EndPath
-    }
-    #endregion 
 }

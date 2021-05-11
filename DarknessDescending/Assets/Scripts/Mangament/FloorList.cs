@@ -5,18 +5,16 @@ using UnityEngine;
 public class FloorList : MonoBehaviour
 {
     public static FloorList floorList;
-    
+
 
     public List<GameObject> DebugFloorObjects = new List<GameObject>();
-
-
 
     public int numberOfFloorTypes = 1;
     public void Awake()
     {
         floorList = this;
     }
-    public GameObject RandomFloorType(int floortype)
+    public GameObject RandomFloorObject(int floortype)
     {
         switch (floortype)
         {
@@ -24,17 +22,6 @@ public class FloorList : MonoBehaviour
                 return DebugFloorObjects[Random.Range(0, (DebugFloorObjects.Count))];
             case 2:
                 return DebugFloorObjects[Random.Range(0, (DebugFloorObjects.Count))];
-        }
-        return null;
-    }
-    public GameObject EndCap(int floorType)
-    {
-        switch (floorType)
-        {
-            case 1:
-                return DebugFloorObjects[DebugFloorObjects.Count];
-            case 2:
-                return DebugFloorObjects[DebugFloorObjects.Count];
         }
         return null;
     }

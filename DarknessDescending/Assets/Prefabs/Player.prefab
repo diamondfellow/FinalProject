@@ -358,6 +358,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.y
       value: 12.7
       objectReference: {fileID: 0}
+    - target: {fileID: 7639999563841951355, guid: 4ee599eb04ef5224492f4ac5daa9e044, type: 3}
+      propertyPath: m_FontData.m_Font
+      value: 
+      objectReference: {fileID: 12800000, guid: a06ff2335b57ead44b4460eb837139c3, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4ee599eb04ef5224492f4ac5daa9e044, type: 3}
 --- !u!224 &7215717777580626147 stripped

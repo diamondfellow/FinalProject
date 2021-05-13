@@ -9,7 +9,7 @@ public class FloorList : MonoBehaviour
 
     public List<GameObject> DebugFloorObjects = new List<GameObject>();
 
-    public int numberOfFloorTypes = 1;
+    public int numberOfFloorTypes = 2;
     public void Awake()
     {
         floorList = this;

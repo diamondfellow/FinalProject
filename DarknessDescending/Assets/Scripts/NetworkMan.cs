@@ -32,6 +32,7 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerDisconnect(NetworkConnection conn)
     {
+        if(isGameProgress) { GameManager.gameMan.NumberofPlayers--; }
         base.OnServerDisconnect(conn);
         Players.Remove(conn);
     }
@@ -45,7 +46,6 @@ public class NetworkMan : NetworkManager
     {
         isGameProgress = true;
         ServerChangeScene("Multiplayer");
-        Debug.Log(Players.Count);
     }
     public override void OnClientConnect(NetworkConnection conn)
     {
@@ -59,7 +59,8 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        if(SceneManager.GetActiveScene().name == "Multiplayer")
+        if (isGameProgress) { GameManager.gameMan.NumberofPlayers++; }
+        if (SceneManager.GetActiveScene().name == "Multiplayer")
         {
             base.OnServerAddPlayer(conn);
         }

@@ -17,15 +17,17 @@ public class Player : NetworkBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private Canvas loadingCanvas;
 
+    [ClientCallback]
     private void Awake()
     {
-        mainCam = Camera.main;
-        
+        mainCam = Camera.main;   
     }
+
     [ClientCallback]
     private void Update()
     {
         if (!hasAuthority) { return; }
+        
         #region Interact
         if (Input.GetKeyUp(KeyCode.E))
         {
@@ -72,17 +74,14 @@ public class Player : NetworkBehaviour
         float vertInput = Input.GetAxis("Vertical");
         Vector3 lookingAt = gameObject.transform.forward * vertInput;
         Vector3 lookingStrafe = gameObject.transform.right * horiInput;
-        if (!spectate)
-        {
-            lookingStrafe = new Vector3(lookingStrafe.x, 0, lookingStrafe.z);
-            lookingAt = new Vector3(lookingAt.x, 0, lookingAt.z);
-        }
         if (spectate)
         {
             gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
         else if (canMove)
         {
+            lookingStrafe = new Vector3(lookingStrafe.x, 0, lookingStrafe.z);
+            lookingAt = new Vector3(lookingAt.x, 0, lookingAt.z);
             gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
         #endregion

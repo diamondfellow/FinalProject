@@ -24,7 +24,7 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private float stageEndTimer = 20f;
 
 
-    private LayerMask roomLayerMask;
+    private LayerMask pathLayerMask;
     private float timer;
     private bool stageEnding = false;
     private int puzzlesToBeSolved = 0;
@@ -96,9 +96,6 @@ public class GameManager : NetworkBehaviour
     {
         gameUI.stageText.text = ("Stage: " + currentStageNumber);
     }
-
-
-
     #region StageStartingOrEndingCode
     // Ran Once when GAme first Loaded 0
     [Server]
@@ -115,6 +112,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void StartStage()
     {
+        RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
         foreach (NetworkConnection conn in NetworkMan.Players)
         {
             TgtAllowPlayer(conn);
@@ -151,12 +149,8 @@ public class GameManager : NetworkBehaviour
     }
     [TargetRpc]
     private void TgtPlayerMoveSpawn(NetworkConnection conn, int playerNumber)
-    {
-
-         conn.identity.gameObject.transform.position = spawnPositions[playerNumber].position;
-            
-
-        
+    { 
+         conn.identity.gameObject.transform.position = spawnPositions[playerNumber].position; 
     }
     #endregion
 
@@ -167,46 +161,53 @@ public class GameManager : NetworkBehaviour
     {
         WaitForSeconds startup = new WaitForSeconds(1);
         WaitForFixedUpdate interval = new WaitForFixedUpdate();
-
         yield return startup;
-
 
         int partsPerSection = 3;
         partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale * NumberofPlayers);
-        stageFloorType = Random.Range(0, (FloorList.floorList.numberOfFloorTypes));
-        for (int o = 0; o < 3; o++)
-        {
-              sectionConnectionPoints = new List<ConnectionPoint>();
-              switch (o)
-              {
-                    case 0:                   
-                    for (int i1 = 0; i1 < partsPerSection; i1++)
-                    {
-                        AddConnectionPoints(FrontStart);
+        stageFloorType = Random.Range(1, (FloorList.floorList.numberOfFloorTypes + 1));
+        Debug.Log(partsPerSection);
+         for (int i = 0; i <= 3; i++)
+         {
+               sectionConnectionPoints = new List<ConnectionPoint>();
+               switch (i)
+               {
+                     case 0:                   
+                     for (int i1 = 0; i1 < partsPerSection; i1++)
+                     {
+                        if(i1 == 0) { AddConnectionPoints(FrontStart); }
+                         PlaceFloorObject();
+                         yield return interval;
+                     }
+                     break;
+                     case 1:
+                     for (int i1 = 0; i1 < partsPerSection; i1++)
+                     {
+                        if (i1 == 0) { AddConnectionPoints(RightStart); }
                         PlaceFloorObject();
-                        yield return interval;
-                    }
-                    break;
-                    case 1:
-                    for (int i1 = 0; i1 < partsPerSection; i1++)
-                    {
-                    }
-                    break;
-                    case 2:
-                    for (int i1 = 0; i1 < partsPerSection; i1++)
-                    {
+                         yield return interval;
+                     }
+                     break;
+                     case 2:
+                     for (int i1 = 0; i1 < partsPerSection; i1++)
+                     {
+                        if (i1 == 0) { AddConnectionPoints(LeftStart); }
+                        PlaceFloorObject();
+                         yield return interval;
 
-                    }
-                    break;
-                    case 3:
-                    for (int i1 = 0; i1 < partsPerSection; i1++)
-                    {
-
-                    }
-                    break;
-              }          
-        }
-        StartStage();
+                     }
+                     break;
+                     case 3:
+                     for (int i1 = 0; i1 < partsPerSection; i1++)
+                     {
+                        if (i1 == 0) { AddConnectionPoints(BackStart); }
+                        PlaceFloorObject();
+                         yield return interval;
+                     }
+                     break;
+               }          
+         }
+         PlacePuzzles();
     }
     //Picks random object to place and snaps it to random open space. 2
     [Server]
@@ -219,48 +220,80 @@ public class GameManager : NetworkBehaviour
         ConnectionPoint nextPointToPlace = sectionConnectionPoints[Random.Range(0, sectionConnectionPoints.Count)];
         GameObject newPath = Instantiate(FloorList.floorList.RandomFloorObject(stageFloorType), hubFloor.gameObject.transform);
         NetworkServer.Spawn(newPath);
+        newPath.transform.localPosition = Vector3.zero;
+        Vector3 transfer = newPath.transform.localRotation.eulerAngles;
+        transfer = new Vector3(transfer.x, 0, 0);
+        newPath.transform.localRotation = Quaternion.Euler(transfer);
 
         ConnectionPoint newPathConnPoint = newPath.GetComponent<Pathway>().connectionPoints
             [Random.Range(0, newPath.GetComponent<Pathway>().connectionPoints.Length)];
+        
 
         PositionNewPath(newPath, newPathConnPoint ,nextPointToPlace);
-        if (!NewPathOverlap())
+       
+        if (NewPathOverlap(newPath.GetComponent<Pathway>()))
         {
             sectionConnectionPoints.Remove(nextPointToPlace);
             PlaceFloorObject();
             return;
-        }
+        }     
         allStagePathways.Add(newPath.GetComponent<Pathway>());
+        AddConnectionPoints(newPath.GetComponent<Pathway>());
 
-        nextPointToPlace.gameObject.SetActive(false);
+            nextPointToPlace.gameObject.SetActive(false);
         sectionConnectionPoints.Remove(nextPointToPlace);
 
         newPathConnPoint.gameObject.SetActive(false);
         sectionConnectionPoints.Remove(newPathConnPoint);
+        return;
     }
     [Server]
-    bool NewPathOverlap()
+    bool NewPathOverlap(Pathway newPath)
     {
+        Bounds bounds = newPath.PathBounds;
+        bounds.Expand(-0.1f);
+
+        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size / 2, newPath.transform.rotation, pathLayerMask);
+        if(colliders.Length > 0)
+        {
+            foreach(Collider c in colliders)
+            {
+                if (c.transform.parent.gameObject.Equals(newPath.gameObject))
+                {
+                    continue;
+                }
+                else
+                {
+                    Destroy(newPath.gameObject);
+                    NetworkServer.Destroy(newPath.gameObject);
+                    return true;
+                }
+            }
+        }
         return false;
     }
     [Server]
     private void PositionNewPath(GameObject newPath, ConnectionPoint currentPoint, ConnectionPoint pointToPlace)
     {
-        newPath.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
 
         Vector3 pointToPlaceEuler = pointToPlace.transform.eulerAngles;
         Vector3 currentPointEuler = currentPoint.transform.eulerAngles;
-        float deltaAngle = Mathf.DeltaAngle(currentPointEuler, pointToPlaceEuler);
+        float deltaAngle = Mathf.DeltaAngle(currentPointEuler.y, pointToPlaceEuler.y);
         Quaternion currentPathTargetRotation = Quaternion.AngleAxis(deltaAngle, Vector3.up);
-        newPath.transform.rotation = currentPathTargetRotation * Quaternion.Euler(0, 180f, 0);
+        newPath.transform.rotation = currentPathTargetRotation * Quaternion.Euler(90f, 90f, 0);
+
+        Vector3 pathPositionOffset = currentPoint.transform.position - newPath.transform.position;
+        newPath.transform.position = pointToPlace.transform.position - pathPositionOffset;
+        return;
     }
     [Server]
     private void AddConnectionPoints(Pathway pathway)
     {
         foreach(ConnectionPoint connpoint in pathway.connectionPoints)
         {
-            sectionConnectionPoints.Add(connpoint);
+            sectionConnectionPoints.Add(connpoint);          
         }
+        return;
     }
     [Server]
     public void PlacePuzzles()
@@ -270,18 +303,16 @@ public class GameManager : NetworkBehaviour
         List<Pathway> puzzlePathways = allStagePathways;
         for (int i = 0; i < puzzlesToBeSolved; i++)
         {
-
-            Transform randomPathway = puzzlePathways[Random.Range(0, allStagePathways.Count + 1)].transform;
-           // Transform randomPuzzlePoint = randomPathway.GetComponent<Pathway>().puzzlePoints
-             //   [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count + 1)].transform;
-            //GameObject puzzle = Instantiate(PuzzleList.puzzleList.EasyPuzzles
-              //  [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count + 1)].gameObject, randomPuzzlePoint);
-            //NetworkServer.Spawn(puzzle);
-            //puzzle.transform.position = Vector3.zero;
-            //puzzle.transform.rotation = randomPuzzlePoint.rotation;
-
+            Transform randomPathway = puzzlePathways[Random.Range(0, allStagePathways.Count)].transform;
+            Transform randomPuzzlePoint = randomPathway.GetComponent<Pathway>().puzzlePoints
+                [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count)].transform;
+            GameObject puzzle = Instantiate(PuzzleList.puzzleList.EasyPuzzles
+                [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count)].gameObject, randomPuzzlePoint.transform.position, randomPuzzlePoint.transform.rotation);
+            NetworkServer.Spawn(puzzle);
+            puzzle.transform.localPosition = Vector3.zero;
+            puzzle.transform.rotation = randomPuzzlePoint.rotation;
         }
-        hubFloor.BuildNavMesh();
+        //hubFloor.BuildNavMesh();
         MonsterSpawn();
     }
     // Spawns in Monsters 5
@@ -292,8 +323,8 @@ public class GameManager : NetworkBehaviour
         for (int i = 0; i < amountOfMonster; i++)
         {
             GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];
-            //GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count + 1)].monsterSpawnPosition, Quaternion.identity);
-            //NetworkServer.Spawn(spawnedMonster);
+            GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count)].monsterSpawn);
+            NetworkServer.Spawn(spawnedMonster);
         }
         StartStage();
     }

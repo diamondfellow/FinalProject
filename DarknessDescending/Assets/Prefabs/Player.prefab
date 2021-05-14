@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5231827512653986058}
   - component: {fileID: 5231827512653986059}
-  - component: {fileID: 5231827512653986164}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -75,14 +74,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!81 &5231827512653986164
-AudioListener:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5231827512653986165}
-  m_Enabled: 1
 --- !u!1 &5231827512901021548
 GameObject:
   m_ObjectHideFlags: 0
@@ -98,6 +89,7 @@ GameObject:
   - component: {fileID: 5231827512901021542}
   - component: {fileID: 5231827512901021541}
   - component: {fileID: 5231827512901021539}
+  - component: {fileID: 4515426440411171597}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -206,6 +198,11 @@ MonoBehaviour:
   lookSpeed: 400
   moveSpeed: 4
   loadingCanvas: {fileID: 7215717777580626144}
+  playerAudio: {fileID: 0}
+  playerAudioClips:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!54 &5231827512901021541
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -238,6 +235,14 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
+--- !u!81 &4515426440411171597
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5231827512901021548}
+  m_Enabled: 1
 --- !u!114 &4721978497665731334
 MonoBehaviour:
   m_ObjectHideFlags: 0

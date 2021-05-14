@@ -17,10 +17,17 @@ public class Player : NetworkBehaviour
     [SerializeField] private float moveSpeed;
     [SerializeField] private Canvas loadingCanvas;
 
+    [SerializeField] AudioSource playerAudio;
+    [SerializeField] AudioClip[] playerAudioClips = new AudioClip[3]; //0 fl on 1 fl off 2 stageEndAlert
+
     [ClientCallback]
     private void Awake()
     {
-        mainCam = Camera.main;   
+        mainCam = Camera.main;
+        if (!hasAuthority)
+        {
+            GetComponent<AudioSource>().enabled = false;
+        }
     }
 
     [ClientCallback]

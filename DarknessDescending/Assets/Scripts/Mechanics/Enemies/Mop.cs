@@ -24,6 +24,14 @@ public class Mop : Enemies
             timer = 0;
             randomMoveTime = Random.Range(moveTime - 2, moveTime + 2);
         }
+        if (navAgent.hasPath && !GetComponent<AudioSource>().isPlaying)
+        {
+            GameManager.gameMan.RpcPlaySound(gameObject, "MopMove");
+        }
+        else if (!navAgent.hasPath)
+        {
+            GameManager.gameMan.RpcStopSound(gameObject);
+        }
     }
     [Server]
     private void DetermineNextPosition()
@@ -32,7 +40,7 @@ public class Mop : Enemies
         randomDirection += transform.position;
         NavMeshHit hit;
         NavMesh.SamplePosition(randomDirection, out hit, moveRadius, 1);
-        
+        Move(hit.position);
     }
     
 }

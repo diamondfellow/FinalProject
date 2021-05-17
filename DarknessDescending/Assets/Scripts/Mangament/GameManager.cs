@@ -26,6 +26,7 @@ public class GameManager : NetworkBehaviour
 
     private LayerMask pathLayerMask;
     private float timer;
+    private float noiseTimer;
     private bool stageEnding = false;
     private int puzzlesToBeSolved = 0;
     private int puzzlesSolved = 0;
@@ -34,6 +35,7 @@ public class GameManager : NetworkBehaviour
     private List<Pathway> allStagePathways = new List<Pathway>();
     private List<ConnectionPoint> sectionConnectionPoints = new List<ConnectionPoint>();
     private float gameScale;
+ 
 
     [ServerCallback]
     public void Awake()
@@ -51,6 +53,12 @@ public class GameManager : NetworkBehaviour
     [ServerCallback]
     public void Update()
     {
+        noiseTimer += Time.deltaTime;
+        int check = Random.Range(Mathf.FloorToInt(noiseTimer), 101);
+        if(check == 100)
+        {
+
+        }
         //NumberofPlayers = 
         if (stageEnding)
         {
@@ -69,6 +77,7 @@ public class GameManager : NetworkBehaviour
         }
     }
 
+
     [Server]
     public void PuzzleComplete(int puzzlesCompleted)
     {
@@ -76,10 +85,45 @@ public class GameManager : NetworkBehaviour
         if (puzzlesSolved >= puzzlesToBeSolved)
         {
             stageEnding = true;
+            foreach(NetworkConnection conn in NetworkMan.Players)
+            {
+                RpcPlaySound(conn.identity.gameObject, "EndStageAlert");
+            }
             RpcEndingUpdate(timer);
         }
         RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
     }
+
+    #region Sound
+    [ClientRpc]
+    public void RpcStopSound(GameObject soundObject)
+    {
+        soundObject.GetComponent<AudioSource>().Stop();
+    }
+    [Server]
+    private void RandomScaryNoise()
+    {
+        int playerNumber = Random.Range(0, NetworkMan.Players.Count);
+        NetworkConnection player = NetworkMan.Players[playerNumber];
+        string noiseID = "ScaryNoise0" + Random.Range(1, 5);
+        TgtPlayPrivateSound(player, noiseID);
+    }
+    [TargetRpc]
+    public void TgtPlayPrivateSound(NetworkConnection conn, string soundID)
+    {
+        AudioSource source = conn.identity.gameObject.GetComponent<AudioSource>();
+        source.clip = SoundList.soundList.GetAudioClip(soundID);
+        source.Play();
+    }
+    [ClientRpc]
+    public void RpcPlaySound(GameObject soundObject, string soundID)
+    {
+        AudioSource source = soundObject.GetComponent<AudioSource>();
+        source.clip = SoundList.soundList.GetAudioClip(soundID);
+        source.Play();
+    }
+    #endregion
+    #region Rpcs
     [ClientRpc]
     private void RpcUpdatePuzzleUI(int puzzles, int totalPuzzles)
     {
@@ -96,6 +140,7 @@ public class GameManager : NetworkBehaviour
     {
         gameUI.stageText.text = ("Stage: " + currentStageNumber);
     }
+    #endregion
     #region StageStartingOrEndingCode
     // Ran Once when GAme first Loaded 0
     [Server]
@@ -297,20 +342,17 @@ public class GameManager : NetworkBehaviour
     }
     [Server]
     public void PlacePuzzles()
-    {
-        
+    {  
         puzzlesToBeSolved = 3 + (NumberofPlayers * currentStageNumber);
         List<Pathway> puzzlePathways = allStagePathways;
         for (int i = 0; i < puzzlesToBeSolved; i++)
         {
-            Transform randomPathway = puzzlePathways[Random.Range(0, allStagePathways.Count)].transform;
+            GameObject randomPathway = puzzlePathways[Random.Range(0, allStagePathways.Count)].gameObject;
             Transform randomPuzzlePoint = randomPathway.GetComponent<Pathway>().puzzlePoints
                 [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count)].transform;
             GameObject puzzle = Instantiate(PuzzleList.puzzleList.EasyPuzzles
                 [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count)].gameObject, randomPuzzlePoint.transform.position, randomPuzzlePoint.transform.rotation);
-            NetworkServer.Spawn(puzzle);
-            puzzle.transform.localPosition = Vector3.zero;
-            puzzle.transform.rotation = randomPuzzlePoint.rotation;
+            NetworkServer.Spawn(puzzle); 
         }
         //hubFloor.BuildNavMesh();
         MonsterSpawn();

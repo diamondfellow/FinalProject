@@ -10,6 +10,7 @@ public class PButton : Puzzle
     [Server]
     public override void Interacted()
     {
+        GameManager.gameMan.RpcPlaySound(gameObject, "ButtonClick");
         base.Interacted();
         ButtonPressed();
         ChangeButtonColor();

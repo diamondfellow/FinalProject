@@ -11,10 +11,10 @@ public class DoorButton : Interactables
 
     [SerializeField] private float OpenSpeed;
     [SerializeField] private float CloseSpeed;
+
     [SerializeField] private AudioSource buttonClick;
     [SerializeField] private AudioSource doorSound;
 
-    [SerializeField] private AudioClip[] doorSounds = new AudioClip[3]; //0 doorCloseMove 1 doorLatch 2 doorSlam
 
     private bool isMoving = false;
     private bool isOpen = true;
@@ -23,15 +23,13 @@ public class DoorButton : Interactables
     [ServerCallback]
     private void Update()
     {
-
         timer += Time.deltaTime;
-
     }
     [Server]
     public override void Interacted()
     {
         base.Interacted();
-        //RpcPlaySound(buttonClick, buttonClick.clip);
+        GameManager.gameMan.RpcPlaySound(buttonClick.gameObject, "ButtonClick");
         if (isOpen && !isMoving)
         {
             StartCoroutine(nameof(Close));
@@ -54,7 +52,7 @@ public class DoorButton : Interactables
             yield return new WaitForSeconds(.01f);
 
         }
-        //RpcPlaySound(doorSound, doorSounds[2]);
+        GameManager.gameMan.RpcPlaySound(doorSound.gameObject, "DoorOpenSlam");
         isOpen = true;
         isMoving = false;
     }
@@ -62,7 +60,7 @@ public class DoorButton : Interactables
     public IEnumerator Close()
     {
         isMoving = true;
-        //RpcPlaySound(doorSound, doorSounds[0]);
+        GameManager.gameMan.RpcPlaySound(doorSound.gameObject,"DoorClosing");
         while (door.transform.position.y < doorClosePos)
         {
 
@@ -73,13 +71,8 @@ public class DoorButton : Interactables
             yield return new WaitForSeconds(.05f);
 
         }
-        //RpcPlaySound(doorSound, doorSounds[1]);
+        GameManager.gameMan.RpcPlaySound(doorSound.gameObject, "DoorClose");
         isOpen = false;
         isMoving = false;
-    }
-    [ClientRpc]
-    void RpcPlaySound(GameObject soundObject)
-    {
-        AudioSource source = soundObject.GetComponent<AudioSource>();
     }
 }

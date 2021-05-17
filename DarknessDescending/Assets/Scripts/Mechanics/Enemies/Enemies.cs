@@ -17,8 +17,7 @@ public class Enemies : NetworkBehaviour
     [Server]
     public virtual void Move(Vector3 movePosition)
     {
-        navAgent.Move(movePosition);
-        
+        navAgent.SetDestination(movePosition);
     }
     
 

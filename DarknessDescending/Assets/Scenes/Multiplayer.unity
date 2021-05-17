@@ -482,6 +482,7 @@ GameObject:
   m_Component:
   - component: {fileID: 268305328}
   - component: {fileID: 268305327}
+  - component: {fileID: 268305329}
   m_Layer: 0
   m_Name: DoorSound
   m_TagString: Untagged
@@ -500,7 +501,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -510,7 +511,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 3.1909447
-  MaxDistance: 500
+  MaxDistance: 99.81789
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -599,6 +600,22 @@ Transform:
   m_Father: {fileID: 644652952}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &268305329
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268305326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 988135810
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &293778459
 GameObject:
   m_ObjectHideFlags: 0
@@ -609,6 +626,7 @@ GameObject:
   m_Component:
   - component: {fileID: 293778460}
   - component: {fileID: 293778461}
+  - component: {fileID: 293778462}
   m_Layer: 0
   m_Name: DoorSound
   m_TagString: Untagged
@@ -641,7 +659,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -651,7 +669,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 3.572361
-  MaxDistance: 500
+  MaxDistance: 94.11523
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -726,6 +744,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &293778462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 293778459}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 1901166211
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &374401116
 GameObject:
   m_ObjectHideFlags: 0
@@ -1003,6 +1037,7 @@ GameObject:
   - component: {fileID: 422648975}
   - component: {fileID: 422648974}
   - component: {fileID: 422648973}
+  - component: {fileID: 422648976}
   m_Layer: 0
   m_Name: GameMangement
   m_TagString: GameManager
@@ -1134,6 +1169,34 @@ MonoBehaviour:
   - {fileID: 3340752197799300471, guid: ba4a6034010c14d46883be2934a0b279, type: 3}
   - {fileID: 7789989761324461670, guid: c15665e22107a824fbef8b0aa863fe75, type: 3}
   numberOfFloorTypes: 1
+--- !u!114 &422648976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 422648968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61db592eaa02a854f8bb8b709fdb65f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allGameSounds:
+  - {fileID: 11400000, guid: 4aff5e843f9b2a846918061f5268d91f, type: 2}
+  - {fileID: 11400000, guid: d543010bb287b0e45b1e6992bc999508, type: 2}
+  - {fileID: 11400000, guid: ad86cbf55f1a6c346833f5d63789bc16, type: 2}
+  - {fileID: 11400000, guid: a932590ade5f2be4d8bd1ecc6675f136, type: 2}
+  - {fileID: 11400000, guid: 79df7bd866fd80043a8677f2ae7136fa, type: 2}
+  - {fileID: 11400000, guid: 1a96a4fe897e70f4884312ca355d5768, type: 2}
+  - {fileID: 11400000, guid: db1939cbb0716574da9f73630bfb844f, type: 2}
+  - {fileID: 11400000, guid: 371ffba0d3ac62548b888557e7cf78f3, type: 2}
+  - {fileID: 11400000, guid: 0c02499757049f44d986c1ec4280a2e4, type: 2}
+  - {fileID: 11400000, guid: 1b49af91a87c07947a6ff0c172a96607, type: 2}
+  - {fileID: 11400000, guid: 46ca99cc9aaeffc4996f34ac164df2bc, type: 2}
+  - {fileID: 11400000, guid: e7053395f99311140856ba8c12d85097, type: 2}
+  - {fileID: 11400000, guid: d5ae9f06596f0b04cad3df4f8b9b7716, type: 2}
+  - {fileID: 11400000, guid: 7aa9772c16e41f0469475d78a808c772, type: 2}
+  - {fileID: 11400000, guid: 121a5d1d166916b43aa2b532cae7fccf, type: 2}
 --- !u!1 &482032869
 GameObject:
   m_ObjectHideFlags: 0
@@ -1144,6 +1207,7 @@ GameObject:
   m_Component:
   - component: {fileID: 482032870}
   - component: {fileID: 482032871}
+  - component: {fileID: 482032872}
   m_Layer: 0
   m_Name: DoorSound
   m_TagString: Untagged
@@ -1176,7 +1240,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1186,7 +1250,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 3.99299
-  MaxDistance: 500
+  MaxDistance: 105.23009
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -1261,6 +1325,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &482032872
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 482032869}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 2200990521
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &495174297
 GameObject:
   m_ObjectHideFlags: 0
@@ -1516,16 +1596,12 @@ MonoBehaviour:
   syncInterval: 0.1
   gameMangaer: {fileID: 0}
   door: {fileID: 389929518}
-  doorOpenPos: -2.25
+  doorOpenPos: -2.1
   doorClosePos: 1.4
   OpenSpeed: 3
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 268305327}
-  doorSounds:
-  - {fileID: 8300000, guid: 84fc3fce985b42347a4707e8ca00c381, type: 3}
-  - {fileID: 8300000, guid: 20a32cfdbb1463549be66a1d039bbe9d, type: 3}
-  - {fileID: 8300000, guid: 2646d75d72c2c53429eec4d2189ab4a6, type: 3}
 --- !u!114 &644652954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1615,7 +1691,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 91444de3cb2cdf54a9913ed45d6f153b, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -1625,7 +1701,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1.6789374
-  MaxDistance: 500
+  MaxDistance: 19.797722
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -2311,16 +2387,12 @@ MonoBehaviour:
   syncInterval: 0.1
   gameMangaer: {fileID: 0}
   door: {fileID: 1863891717}
-  doorOpenPos: -2.25
+  doorOpenPos: -2.1
   doorClosePos: 1.4
   OpenSpeed: 3
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 1710194629}
-  doorSounds:
-  - {fileID: 8300000, guid: 84fc3fce985b42347a4707e8ca00c381, type: 3}
-  - {fileID: 8300000, guid: 20a32cfdbb1463549be66a1d039bbe9d, type: 3}
-  - {fileID: 8300000, guid: 2646d75d72c2c53429eec4d2189ab4a6, type: 3}
 --- !u!114 &1134164486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2425,7 +2497,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 91444de3cb2cdf54a9913ed45d6f153b, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -2435,7 +2507,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1.404026
-  MaxDistance: 500
+  MaxDistance: 18.489555
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -8116,7 +8188,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh20566
+  m_Name: pb_Mesh18506
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -8327,16 +8399,12 @@ MonoBehaviour:
   syncInterval: 0.1
   gameMangaer: {fileID: 0}
   door: {fileID: 1069168823}
-  doorOpenPos: -2.25
+  doorOpenPos: -2.1
   doorClosePos: 1.4
   OpenSpeed: 3
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 293778461}
-  doorSounds:
-  - {fileID: 8300000, guid: 84fc3fce985b42347a4707e8ca00c381, type: 3}
-  - {fileID: 8300000, guid: 20a32cfdbb1463549be66a1d039bbe9d, type: 3}
-  - {fileID: 8300000, guid: 2646d75d72c2c53429eec4d2189ab4a6, type: 3}
 --- !u!114 &1540640900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8426,7 +8494,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 91444de3cb2cdf54a9913ed45d6f153b, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -8436,7 +8504,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1.4232645
-  MaxDistance: 500
+  MaxDistance: 18.967705
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -8521,6 +8589,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1710194628}
   - component: {fileID: 1710194629}
+  - component: {fileID: 1710194630}
   m_Layer: 0
   m_Name: DoorSound
   m_TagString: Untagged
@@ -8536,7 +8605,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1710194627}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.031425808, y: 1.02, z: 2.789841}
+  m_LocalPosition: {x: 0.58140886, y: 1.02, z: 2.785617}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1134164490}
@@ -8553,7 +8622,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -8563,7 +8632,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 3.5910273
-  MaxDistance: 500
+  MaxDistance: 101.90394
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -8638,6 +8707,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1710194630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1710194627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneId: 3664526248
+  serverOnly: 0
+  m_AssetId: 
+  hasSpawned: 0
 --- !u!1 &1730932766
 GameObject:
   m_ObjectHideFlags: 0
@@ -8882,16 +8967,12 @@ MonoBehaviour:
   syncInterval: 0.1
   gameMangaer: {fileID: 0}
   door: {fileID: 374401116}
-  doorOpenPos: -2.25
+  doorOpenPos: -2.1
   doorClosePos: 1.4
   OpenSpeed: 3
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 482032871}
-  doorSounds:
-  - {fileID: 8300000, guid: 84fc3fce985b42347a4707e8ca00c381, type: 3}
-  - {fileID: 8300000, guid: 20a32cfdbb1463549be66a1d039bbe9d, type: 3}
-  - {fileID: 8300000, guid: 2646d75d72c2c53429eec4d2189ab4a6, type: 3}
 --- !u!114 &1993133210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8981,7 +9062,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 91444de3cb2cdf54a9913ed45d6f153b, type: 3}
-  m_PlayOnAwake: 1
+  m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
   Loop: 0
@@ -8991,7 +9072,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1.5194616
-  MaxDistance: 500
+  MaxDistance: 19.765553
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0

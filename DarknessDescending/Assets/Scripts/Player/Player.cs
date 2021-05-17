@@ -16,10 +16,12 @@ public class Player : NetworkBehaviour
     [SerializeField] private float lookSpeed;
     [SerializeField] private float moveSpeed;
     [SerializeField] private Canvas loadingCanvas;
+    [SerializeField] private float footstepTimerCheck;
 
     [SerializeField] AudioSource playerAudio;
     [SerializeField] AudioClip[] playerAudioClips = new AudioClip[3]; //0 fl on 1 fl off 2 stageEndAlert
 
+    private float footstepTimer;
     [ClientCallback]
     private void Awake()
     {
@@ -34,7 +36,13 @@ public class Player : NetworkBehaviour
     private void Update()
     {
         if (!hasAuthority) { return; }
-        
+        footstepTimer += Time.deltaTime;
+
+        if(footstepTimer > footstepTimerCheck)
+        {
+            CmdPlayFootstep();
+        }
+
         #region Interact
         if (Input.GetKeyUp(KeyCode.E))
         {
@@ -51,7 +59,6 @@ public class Player : NetworkBehaviour
         }
         if (Input.GetKeyDown(KeyCode.F))
         {
-            headlamp.enabled = !headlamp.enabled;
             CmdFlashligt();
         }
         #endregion
@@ -91,7 +98,17 @@ public class Player : NetworkBehaviour
             lookingAt = new Vector3(lookingAt.x, 0, lookingAt.z);
             gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
+        if(gameObject.GetComponent<Rigidbody>().velocity.x < .1 && gameObject.GetComponent<Rigidbody>().velocity.z < .1)
+        {
+            footstepTimer = 0;
+        }
         #endregion
+    }
+    [Command]
+    private void CmdPlayFootstep()
+    {
+        string soundID = "Footstep0" + Random.Range(1, 4);
+        GameManager.gameMan.RpcPlaySound(gameObject, soundID);
     }
     [Client]
     public void SeeMove()
@@ -132,19 +149,20 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdFlashligt()
     {
-        SvrFlashlight();
-    }
-    [Server]
-    private void SvrFlashlight()
-    {
-        ClntFlashlight();
+        RpcFlashlight();
     }
     [ClientRpc]
-    private void ClntFlashlight()
+    private void RpcFlashlight()
     {
+        if (headlamp.enabled)
+        {
+            GameManager.gameMan.RpcPlaySound(gameObject, "FlashlightOff");
+        }
+        else
+        {
+            GameManager.gameMan.RpcPlaySound(gameObject, "FlashlightOn");
+        }
         headlamp.enabled = !headlamp.enabled;
     }
     #endregion
-
-
 }

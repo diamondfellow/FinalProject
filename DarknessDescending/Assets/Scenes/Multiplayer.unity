@@ -466,7 +466,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 267330318}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -5}
+  m_LocalPosition: {x: 0, y: 1, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 830213099}
@@ -1089,6 +1089,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   NumberofPlayers: 0
+  endingDoors: 0
   gameUI: {fileID: 422648969}
   FrontStart: {fileID: 1030044271}
   BackStart: {fileID: 41573989}
@@ -1100,10 +1101,10 @@ MonoBehaviour:
   - {fileID: 1871021319}
   - {fileID: 267330319}
   doorButtons:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1134164484}
+  - {fileID: 644652951}
+  - {fileID: 1993133207}
+  - {fileID: 1540640897}
   hubFloor: {fileID: 1331794218}
   gameScaling: 0.1
   stageEndTimer: 20
@@ -1136,7 +1137,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EasyPuzzles:
-  - {fileID: 4513858935311042505, guid: 4d56a2a04a1faa9479a98d81c9280d0a, type: 3}
+  - {fileID: -3245436603115302647, guid: 4d56a2a04a1faa9479a98d81c9280d0a, type: 3}
 --- !u!114 &422648974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1537,7 +1538,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 627076802}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 5, y: 0, z: 0}
+  m_LocalPosition: {x: 5, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 830213099}
@@ -1594,7 +1595,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  gameMangaer: {fileID: 0}
   door: {fileID: 389929518}
   doorOpenPos: -2.1
   doorClosePos: 1.4
@@ -1602,6 +1602,7 @@ MonoBehaviour:
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 268305327}
+  isCoolDoor: 0
 --- !u!114 &644652954
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2285,7 +2286,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1112330501
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2312,7 +2313,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1112330500}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
@@ -2385,7 +2386,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  gameMangaer: {fileID: 0}
   door: {fileID: 1863891717}
   doorOpenPos: -2.1
   doorClosePos: 1.4
@@ -2393,6 +2393,7 @@ MonoBehaviour:
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 1710194629}
+  isCoolDoor: 1
 --- !u!114 &1134164486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2675,6 +2676,7 @@ GameObject:
   - component: {fileID: 1331794214}
   - component: {fileID: 1331794213}
   - component: {fileID: 1331794218}
+  - component: {fileID: 1331794219}
   m_Layer: 0
   m_Name: Hub
   m_TagString: Untagged
@@ -8116,6 +8118,19 @@ MonoBehaviour:
   m_VoxelSize: 0.16666667
   m_BuildHeightMesh: 0
   m_NavMeshData: {fileID: 0}
+--- !u!65 &1331794219
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1331794212}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 18.4, y: 5.5, z: 18.4}
+  m_Center: {x: 0.0000009536745, y: 0.0015136003, z: -0.0000009536745}
 --- !u!1 &1370087371
 GameObject:
   m_ObjectHideFlags: 0
@@ -8188,7 +8203,7 @@ Mesh:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: pb_Mesh18506
+  m_Name: pb_Mesh85172
   serializedVersion: 10
   m_SubMeshes:
   - serializedVersion: 2
@@ -8397,7 +8412,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  gameMangaer: {fileID: 0}
   door: {fileID: 1069168823}
   doorOpenPos: -2.1
   doorClosePos: 1.4
@@ -8405,6 +8419,7 @@ MonoBehaviour:
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 293778461}
+  isCoolDoor: 0
 --- !u!114 &1540640900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8747,7 +8762,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1730932766}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5, y: 0, z: 0}
+  m_LocalPosition: {x: -5, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 830213099}
@@ -8908,7 +8923,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1871021318}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 5}
+  m_LocalPosition: {x: 0, y: 1, z: 5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 830213099}
@@ -8965,7 +8980,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  gameMangaer: {fileID: 0}
   door: {fileID: 374401116}
   doorOpenPos: -2.1
   doorClosePos: 1.4
@@ -8973,6 +8987,7 @@ MonoBehaviour:
   CloseSpeed: 0.5
   buttonClick: {fileID: 644652958}
   doorSound: {fileID: 482032871}
+  isCoolDoor: 0
 --- !u!114 &1993133210
 MonoBehaviour:
   m_ObjectHideFlags: 0

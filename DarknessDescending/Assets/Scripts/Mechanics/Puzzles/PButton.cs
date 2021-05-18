@@ -10,21 +10,19 @@ public class PButton : Puzzle
     [Server]
     public override void Interacted()
     {
-        GameManager.gameMan.RpcPlaySound(gameObject, "ButtonClick");
         base.Interacted();
+        GameManager.gameMan.RpcPlaySound(gameObject, "ButtonClick");
         ButtonPressed();
-        ChangeButtonColor();
+        RpcChangeButtonColor();  
     }
     [ClientRpc]
-    public void ChangeButtonColor()
+    public void RpcChangeButtonColor()
     {
-        gameObject.GetComponent<Material>().color = onColor;
+        gameObject.GetComponent<MeshRenderer>().material.color = onColor;
     }
     [Server]
-    private void ButtonPressed()
+    public void ButtonPressed()
     {
-        gameMangaer.PuzzleComplete(1);
+        GameManager.gameMan.PuzzleComplete(1);
     }
-
-   
 }

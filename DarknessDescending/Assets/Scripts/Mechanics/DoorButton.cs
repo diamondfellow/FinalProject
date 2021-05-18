@@ -14,6 +14,7 @@ public class DoorButton : Interactables
 
     [SerializeField] private AudioSource buttonClick;
     [SerializeField] private AudioSource doorSound;
+    [SerializeField] private bool isCoolDoor;
 
 
     private bool isMoving = false;
@@ -38,6 +39,7 @@ public class DoorButton : Interactables
         {
             StartCoroutine(nameof(Open));
         }
+        return;
     }
     [Server]
     public IEnumerator Open()
@@ -74,5 +76,9 @@ public class DoorButton : Interactables
         GameManager.gameMan.RpcPlaySound(doorSound.gameObject, "DoorClose");
         isOpen = false;
         isMoving = false;
+        if (isCoolDoor && GameManager.gameMan.endingDoors)
+        {
+            GameManager.gameMan.DoorsClosed();
+        }
     }
 }

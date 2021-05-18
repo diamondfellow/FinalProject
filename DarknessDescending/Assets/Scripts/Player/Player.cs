@@ -18,8 +18,6 @@ public class Player : NetworkBehaviour
     [SerializeField] private Canvas loadingCanvas;
     [SerializeField] private float footstepTimerCheck;
 
-    [SerializeField] AudioSource playerAudio;
-    [SerializeField] AudioClip[] playerAudioClips = new AudioClip[3]; //0 fl on 1 fl off 2 stageEndAlert
 
     private float footstepTimer;
     [ClientCallback]
@@ -28,7 +26,7 @@ public class Player : NetworkBehaviour
         mainCam = Camera.main;
         if (!hasAuthority)
         {
-            GetComponent<AudioSource>().enabled = false;
+            
         }
     }
 
@@ -36,6 +34,7 @@ public class Player : NetworkBehaviour
     private void Update()
     {
         if (!hasAuthority) { return; }
+
         footstepTimer += Time.deltaTime;
 
         if(footstepTimer > footstepTimerCheck)
@@ -53,7 +52,7 @@ public class Player : NetworkBehaviour
                 Interactables objectInteract;
                 if (hit.collider.transform.gameObject.TryGetComponent<Interactables>(out objectInteract))
                 {
-                    Interact(objectInteract);
+                    CmdInteract(objectInteract);
                 }
             }
         }
@@ -107,6 +106,10 @@ public class Player : NetworkBehaviour
     [Command]
     private void CmdPlayFootstep()
     {
+        if (gameObject.GetComponent<AudioSource>().isPlaying)
+        {
+            return;
+        }
         string soundID = "Footstep0" + Random.Range(1, 4);
         GameManager.gameMan.RpcPlaySound(gameObject, soundID);
     }
@@ -117,7 +120,7 @@ public class Player : NetworkBehaviour
         canMove = !canMove;
     }
     [Command]
-    private void Interact(Interactables objectToInteract)
+    private void CmdInteract(Interactables objectToInteract)
     {
         objectToInteract.Interacted();
     }

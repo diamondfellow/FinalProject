@@ -8,8 +8,9 @@ public class GameManager : NetworkBehaviour
 {
     public static GameManager gameMan;
 
+    [HideInInspector]
     public int NumberofPlayers;
-    
+    public bool endingDoors;
 
     [SerializeField] private GameUI gameUI;
     [SerializeField] private Pathway FrontStart;
@@ -23,8 +24,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private float gameScaling = .1f; //Amount per stage increase in percent .1 - 1;
     [SerializeField] private float stageEndTimer = 20f;
 
-
     private LayerMask pathLayerMask;
+    private LayerMask playerMask;
     private float timer;
     private float noiseTimer;
     private bool stageEnding = false;
@@ -33,9 +34,13 @@ public class GameManager : NetworkBehaviour
     private int currentStageNumber = 0;
     private int stageFloorType;
     private List<Pathway> allStagePathways = new List<Pathway>();
+    private List<GameObject> allStagePuzzles = new List<GameObject>();
+    private List<GameObject> allStageMonsters = new List<GameObject>();
     private List<ConnectionPoint> sectionConnectionPoints = new List<ConnectionPoint>();
     private float gameScale;
- 
+
+
+
 
     [ServerCallback]
     public void Awake()
@@ -66,17 +71,22 @@ public class GameManager : NetworkBehaviour
             RpcEndingUpdate(timer);
             if(timer < 0)
             {
+                endingDoors = true;
                 foreach(GameObject doorButton in doorButtons)
                 {
-                    GetComponent<DoorButton>().Close();
+                    doorButton.GetComponent<DoorButton>().StartCoroutine("Close");
                 }
-                StartNewStage();
-                stageEnding = false;
-                timer = stageEndTimer;
             }
         }
     }
-
+    [Server]
+    public void DoorsClosed()
+    {
+        endingDoors = false;
+        StartNewStage();
+        stageEnding = false;
+        timer = stageEndTimer;
+    }
 
     [Server]
     public void PuzzleComplete(int puzzlesCompleted)
@@ -84,6 +94,7 @@ public class GameManager : NetworkBehaviour
         puzzlesSolved += puzzlesCompleted;
         if (puzzlesSolved >= puzzlesToBeSolved)
         {
+            Debug.Log("puzzle complete");
             stageEnding = true;
             foreach(NetworkConnection conn in NetworkMan.Players)
             {
@@ -132,8 +143,8 @@ public class GameManager : NetworkBehaviour
     [ClientRpc]
     private void RpcEndingUpdate(float time)
     {
+        gameUI.endingText.text = ("GET  BACK  TO  THE  CENTER \n TIME  LEFT:  " + Mathf.Round(time));
         gameUI.endingText.enabled = true;
-        gameUI.endingText.text = ("GET BACK TO THE CENTER \n TIME LEFT: " + Mathf.Round(time));
     }
     [ClientRpc]
     private void RpcStageUpdate()
@@ -183,10 +194,28 @@ public class GameManager : NetworkBehaviour
             Destroy(pathway.gameObject);
             NetworkServer.Destroy(pathway.gameObject);
         }
+        foreach(GameObject puzzle in allStagePuzzles)
+        {
+            Destroy(puzzle);
+            NetworkServer.Destroy(puzzle);
+        }
+        foreach(GameObject monster in allStageMonsters)
+        {
+            Destroy(monster);
+            NetworkServer.Destroy(monster);
+        }
+        puzzlesSolved = 0;
+        allStageMonsters.Clear();
+        allStagePuzzles.Clear();
         allStagePathways.Clear();
         StartCoroutine(nameof(BuildMap));
     }
-
+    [Server]
+    private void CheckForPlayers()
+    {
+        Bounds bounds = hubFloor.gameObject.GetComponent<BoxCollider>().bounds;
+        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size / 2, hubFloor.transform.rotation, playerMask);
+    }
     [TargetRpc]
     private void TgtAllowPlayer(NetworkConnection player)
     {
@@ -344,7 +373,9 @@ public class GameManager : NetworkBehaviour
     public void PlacePuzzles()
     {  
         puzzlesToBeSolved = 3 + (NumberofPlayers * currentStageNumber);
-        List<Pathway> puzzlePathways = allStagePathways;
+        List<Pathway> puzzlePathways = new List<Pathway>();
+        puzzlePathways.Clear();
+        puzzlePathways = allStagePathways;
         for (int i = 0; i < puzzlesToBeSolved; i++)
         {
             GameObject randomPathway = puzzlePathways[Random.Range(0, allStagePathways.Count)].gameObject;
@@ -352,9 +383,10 @@ public class GameManager : NetworkBehaviour
                 [Random.Range(0, randomPathway.GetComponent<Pathway>().puzzlePoints.Count)].transform;
             GameObject puzzle = Instantiate(PuzzleList.puzzleList.EasyPuzzles
                 [Random.Range(0, PuzzleList.puzzleList.EasyPuzzles.Count)].gameObject, randomPuzzlePoint.transform.position, randomPuzzlePoint.transform.rotation);
-            NetworkServer.Spawn(puzzle); 
+            NetworkServer.Spawn(puzzle);
+            allStagePuzzles.Add(puzzle);
         }
-        //hubFloor.BuildNavMesh();
+        hubFloor.BuildNavMesh();
         MonsterSpawn();
     }
     // Spawns in Monsters 5
@@ -367,6 +399,7 @@ public class GameManager : NetworkBehaviour
             GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];
             GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count)].monsterSpawn);
             NetworkServer.Spawn(spawnedMonster);
+            allStageMonsters.Add(spawnedMonster);
         }
         StartStage();
     }

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5231827512653986058}
   - component: {fileID: 5231827512653986059}
+  - component: {fileID: 7254795477141991045}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -74,6 +75,68 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!108 &7254795477141991045
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5231827512653986165}
+  m_Enabled: 1
+  serializedVersion: 10
+  m_Type: 0
+  m_Shape: 0
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 2.32
+  m_Range: 8.380534
+  m_SpotAngle: 64.84238
+  m_InnerSpotAngle: 21.80208
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+    m_CullingMatrixOverride:
+      e00: 1
+      e01: 0
+      e02: 0
+      e03: 0
+      e10: 0
+      e11: 1
+      e12: 0
+      e13: 0
+      e20: 0
+      e21: 0
+      e22: 1
+      e23: 0
+      e30: 0
+      e31: 0
+      e32: 0
+      e33: 1
+    m_UseCullingMatrixOverride: 0
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingLayerMask: 1
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_UseBoundingSphereOverride: 0
+  m_UseViewFrustumForShadowCasterCull: 1
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
 --- !u!1 &5231827512901021548
 GameObject:
   m_ObjectHideFlags: 0
@@ -91,7 +154,7 @@ GameObject:
   - component: {fileID: 5231827512901021539}
   - component: {fileID: 4515426440411171597}
   - component: {fileID: 8463233488065680259}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -192,19 +255,14 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   interactDistance: 0
-  headlamp: {fileID: 0}
+  headlamp: {fileID: 7254795477141991045}
   canMove: 0
   spectate: 0
   isDead: 0
   lookSpeed: 400
   moveSpeed: 4
   loadingCanvas: {fileID: 7215717777580626144}
-  footstepTimerCheck: 0
-  playerAudio: {fileID: 0}
-  playerAudioClips:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  footstepTimerCheck: 0.2
 --- !u!54 &5231827512901021541
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -460,6 +518,14 @@ PrefabInstance:
     - target: {fileID: 7639999563316148494, guid: 4ee599eb04ef5224492f4ac5daa9e044, type: 3}
       propertyPath: m_LocalScale.y
       value: 12.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639999563841951333, guid: 4ee599eb04ef5224492f4ac5daa9e044, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -7.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7639999563841951333, guid: 4ee599eb04ef5224492f4ac5daa9e044, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 7639999563841951355, guid: 4ee599eb04ef5224492f4ac5daa9e044, type: 3}
       propertyPath: m_FontData.m_Font

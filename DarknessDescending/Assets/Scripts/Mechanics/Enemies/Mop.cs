@@ -36,7 +36,8 @@ public class Mop : Enemies
     [Server]
     private void DetermineNextPosition()
     {
-        Vector3 randomDirection = Vector3.zero;
+        Vector3 randomDirection = Random.insideUnitSphere * moveRadius;
+
         randomDirection += transform.position;
         NavMeshHit hit;
         NavMesh.SamplePosition(randomDirection, out hit, moveRadius, 1);

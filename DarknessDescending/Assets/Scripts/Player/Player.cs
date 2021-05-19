@@ -16,6 +16,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private float lookSpeed;
     [SerializeField] private float moveSpeed;
     [SerializeField] private Canvas loadingCanvas;
+    [SerializeField] private GameObject DeathImage;
     [SerializeField] private float footstepTimerCheck;
 
 
@@ -26,7 +27,7 @@ public class Player : NetworkBehaviour
         mainCam = Camera.main;
         if (!hasAuthority)
         {
-            
+
         }
     }
 
@@ -37,7 +38,7 @@ public class Player : NetworkBehaviour
 
         footstepTimer += Time.deltaTime;
 
-        if(footstepTimer > footstepTimerCheck)
+        if (footstepTimer > footstepTimerCheck)
         {
             CmdPlayFootstep();
         }
@@ -71,14 +72,14 @@ public class Player : NetworkBehaviour
         // Up and Down Camera
         Vector3 cameraRotation = mainCam.transform.rotation.eulerAngles;
         cameraRotation.x += -(lookSpeed * Input.GetAxis("Mouse Y") * Time.deltaTime);
-        if(cameraRotation.x > 85 && cameraRotation.x < 300)
+        if (cameraRotation.x > 85 && cameraRotation.x < 300)
         {
             cameraRotation.x = 300;
         }
-        else if(cameraRotation.x < 295 && cameraRotation.x > 80 )
+        else if (cameraRotation.x < 295 && cameraRotation.x > 80)
         {
             cameraRotation.x = 80;
-        }      
+        }
         Quaternion transferUpDown = Quaternion.Euler(cameraRotation);
         mainCam.transform.rotation = transferUpDown;
         #endregion
@@ -89,6 +90,7 @@ public class Player : NetworkBehaviour
         Vector3 lookingStrafe = gameObject.transform.right * horiInput;
         if (spectate)
         {
+            Debug.Log("spec");
             gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
         else if (canMove)
@@ -97,7 +99,7 @@ public class Player : NetworkBehaviour
             lookingAt = new Vector3(lookingAt.x, 0, lookingAt.z);
             gameObject.GetComponent<Rigidbody>().velocity = ((lookingStrafe + lookingAt) * moveSpeed);
         }
-        if(gameObject.GetComponent<Rigidbody>().velocity.x < .1 && gameObject.GetComponent<Rigidbody>().velocity.z < .1)
+        if (gameObject.GetComponent<Rigidbody>().velocity.x < .1 && gameObject.GetComponent<Rigidbody>().velocity.z < .1)
         {
             footstepTimer = 0;
         }
@@ -116,8 +118,11 @@ public class Player : NetworkBehaviour
     [Client]
     public void SeeMove()
     {
-        loadingCanvas.enabled = !loadingCanvas.enabled;
-        canMove = !canMove;
+        if (!spectate)
+        {
+            loadingCanvas.enabled = !loadingCanvas.enabled;
+            canMove = !canMove;
+        }
     }
     [Command]
     private void CmdInteract(Interactables objectToInteract)
@@ -128,20 +133,18 @@ public class Player : NetworkBehaviour
     #region DeathCode
 
     [ServerCallback]
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == ("Monster"))
+        if (collision.gameObject.tag == "Monster")
         {
-            gameObject.GetComponent<MeshRenderer>().enabled = false;
-            gameObject.GetComponent<CapsuleCollider>().enabled = false;
-            gameObject.GetComponent<Rigidbody>().useGravity = false;
+            spectate = true;
             isDead = true;
+            DeathImage.SetActive(true);
             RpcKillPlayer();
-
         }
     }
     [ClientRpc]
-    private void RpcKillPlayer()
+    public void RpcKillPlayer()
     {
         gameObject.GetComponent<Rigidbody>().useGravity = false;
         gameObject.GetComponent<MeshRenderer>().enabled = false;
@@ -166,6 +169,33 @@ public class Player : NetworkBehaviour
             GameManager.gameMan.RpcPlaySound(gameObject, "FlashlightOn");
         }
         headlamp.enabled = !headlamp.enabled;
+    }
+    #endregion
+    #region UICode
+    [Client]
+    public void Spectate()
+    {
+        DeathImage.SetActive(false);
+    }
+    [Client]
+    public void OpenPause()
+    {
+
+    }
+    [Client]
+    public void ClosePause()
+    {
+
+    }
+    [Client]
+    public void LeaveGame()
+    {
+        GetComponent<NetworkIdentity>().connectionToServer.Disconnect();
+    }
+    [Client]
+    public void Settings()
+    {
+
     }
     #endregion
 }

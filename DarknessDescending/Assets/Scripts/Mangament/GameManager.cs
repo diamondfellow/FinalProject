@@ -82,6 +82,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void DoorsClosed()
     {
+        CheckForPlayers();
         endingDoors = false;
         StartNewStage();
         stageEnding = false;
@@ -215,6 +216,24 @@ public class GameManager : NetworkBehaviour
     {
         Bounds bounds = hubFloor.gameObject.GetComponent<BoxCollider>().bounds;
         Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size / 2, hubFloor.transform.rotation, playerMask);
+        List<NetworkConnection> tempList = NetworkMan.Players;
+        if (colliders.Length > 0)
+        {
+            foreach (Collider c in colliders)
+            {
+                foreach (NetworkConnection conn in tempList)
+                {
+                    if (c.gameObject == conn.identity.gameObject)
+                    {
+                        tempList.Remove(conn);
+                    }
+                }
+            }
+        }
+        foreach(NetworkConnection conn in tempList)
+        {
+            conn.identity.gameObject.GetComponent<Player>().RpcKillPlayer();
+        }
     }
     [TargetRpc]
     private void TgtAllowPlayer(NetworkConnection player)
@@ -223,8 +242,9 @@ public class GameManager : NetworkBehaviour
     }
     [TargetRpc]
     private void TgtPlayerMoveSpawn(NetworkConnection conn, int playerNumber)
-    { 
-         conn.identity.gameObject.transform.position = spawnPositions[playerNumber].position; 
+    {
+       // if (conn.identity.gameObject.GetComponent<Player>().spectate) { return; } //Spectating players wont go to spawn on new stage
+        conn.identity.gameObject.transform.position = spawnPositions[playerNumber].position; 
     }
     #endregion
 
@@ -397,7 +417,7 @@ public class GameManager : NetworkBehaviour
         for (int i = 0; i < amountOfMonster; i++)
         {
             GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];
-            GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count)].monsterSpawn);
+            GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count)].monsterSpawn.position, Quaternion.identity);
             NetworkServer.Spawn(spawnedMonster);
             allStageMonsters.Add(spawnedMonster);
         }

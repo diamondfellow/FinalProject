@@ -12,6 +12,13 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private InputField addressInput;
     [SerializeField] private Button joinButton;
 
+    private void Awake()
+    {
+        if (NetworkManager.singleton.isNetworkActive)
+        {
+            mainMenu.SetActive(false);
+        }
+    }
     public void Quit()
     {
         Application.Quit();

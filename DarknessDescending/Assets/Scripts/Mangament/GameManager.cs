@@ -26,6 +26,7 @@ public class GameManager : NetworkBehaviour
 
     private LayerMask pathLayerMask;
     private LayerMask playerMask;
+    private int UIDeadPlayers; // used for reurning to lobby when all players are dead
     private float timer;
     private float noiseTimer;
     private bool stageEnding = false;
@@ -33,7 +34,7 @@ public class GameManager : NetworkBehaviour
     private int puzzlesSolved = 0;
     private int currentStageNumber = 0;
     private int stageFloorType;
-    private List<Pathway> allStagePathways = new List<Pathway>();
+    public List<Pathway> allStagePathways = new List<Pathway>();
     private List<GameObject> allStagePuzzles = new List<GameObject>();
     private List<GameObject> allStageMonsters = new List<GameObject>();
     private List<ConnectionPoint> sectionConnectionPoints = new List<ConnectionPoint>();
@@ -52,6 +53,7 @@ public class GameManager : NetworkBehaviour
     [ServerCallback]
     public void Start()
     {
+        UIDeadPlayers = NetworkMan.Players.Count;
         hubFloor.collectObjects = CollectObjects.Children;
         StartGame();
     }
@@ -88,7 +90,20 @@ public class GameManager : NetworkBehaviour
         stageEnding = false;
         timer = stageEndTimer;
     }
-
+    [Server]
+    public void DeathCheck()
+    {
+        foreach(NetworkConnection conn in NetworkMan.Players)
+        {
+            if (!conn.identity.gameObject.GetComponent<Player>().isDead)
+            {
+                return;
+            }
+        }
+        Time.timeScale = 0;
+        RpcSetTimeScale(0);
+        gameUI.deadUI.SetActive(true);
+    }
     [Server]
     public void PuzzleComplete(int puzzlesCompleted)
     {
@@ -105,7 +120,22 @@ public class GameManager : NetworkBehaviour
         }
         RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
     }
-
+    [Server]
+    private void BackToLobby()
+    {
+        NetworkManager.singleton.ServerChangeScene("MainMenu");
+    }
+    [Command]
+    public void CmdDeathBackLobby(GameObject button)
+    {
+        button.SetActive(false);
+        UIDeadPlayers--;
+        RpcUpdatePlayersLeave();
+        if(UIDeadPlayers <= 0)
+        {
+            BackToLobby();
+        }
+    }
     #region Sound
     [ClientRpc]
     public void RpcStopSound(GameObject soundObject)
@@ -136,6 +166,16 @@ public class GameManager : NetworkBehaviour
     }
     #endregion
     #region Rpcs
+    [ClientRpc]
+    private void RpcUpdatePlayersLeave()
+    {
+        gameUI.playersLeave.text = "" + UIDeadPlayers;
+    }
+    [ClientRpc]
+    private void RpcSetTimeScale(float timeScale)
+    {
+        Time.timeScale = timeScale;
+    }
     [ClientRpc]
     private void RpcUpdatePuzzleUI(int puzzles, int totalPuzzles)
     {

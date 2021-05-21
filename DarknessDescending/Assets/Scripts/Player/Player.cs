@@ -13,10 +13,12 @@ public class Player : NetworkBehaviour
     public bool isDead = false;
 
     private Camera mainCam;
+    private bool isPaused;
     [SerializeField] private float lookSpeed;
     [SerializeField] private float moveSpeed;
-    [SerializeField] private Canvas loadingCanvas;
+    [SerializeField] private GameObject loadingCanvas;
     [SerializeField] private GameObject DeathImage;
+    [SerializeField] private Canvas pauseMenu;
     [SerializeField] private float footstepTimerCheck;
 
 
@@ -36,6 +38,15 @@ public class Player : NetworkBehaviour
     {
         if (!hasAuthority) { return; }
 
+        if (Input.GetKeyDown(KeyCode.Escape) && isPaused)
+        {
+            ClosePause();
+        }
+        else if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            OpenPause();
+        }
+        if (isPaused) { return; }
         footstepTimer += Time.deltaTime;
 
         if (footstepTimer > footstepTimerCheck)
@@ -43,6 +54,7 @@ public class Player : NetworkBehaviour
             CmdPlayFootstep();
         }
 
+        
         #region Interact
         if (Input.GetKeyUp(KeyCode.E))
         {
@@ -120,7 +132,7 @@ public class Player : NetworkBehaviour
     {
         if (!spectate)
         {
-            loadingCanvas.enabled = !loadingCanvas.enabled;
+            loadingCanvas.SetActive(!loadingCanvas.activeSelf);
             canMove = !canMove;
         }
     }
@@ -139,6 +151,7 @@ public class Player : NetworkBehaviour
         {
             spectate = true;
             isDead = true;
+            loadingCanvas.SetActive(true);
             DeathImage.SetActive(true);
             RpcKillPlayer();
         }
@@ -175,17 +188,21 @@ public class Player : NetworkBehaviour
     [Client]
     public void Spectate()
     {
+        moveSpeed *= 3;
+        loadingCanvas.SetActive(false);
         DeathImage.SetActive(false);
     }
     [Client]
     public void OpenPause()
     {
-
+        isPaused = true;
+        pauseMenu.enabled = true;
     }
     [Client]
     public void ClosePause()
     {
-
+        isPaused = false;
+        pauseMenu.enabled = false;
     }
     [Client]
     public void LeaveGame()

@@ -8,4 +8,7 @@ public class GameUI : MonoBehaviour
     public Text endingText;
     public Text puzzleText;
     public Text stageText;
+    public GameObject deadUI;
+    public Text playersLeave;
+    
 }

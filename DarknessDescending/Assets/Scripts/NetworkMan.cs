@@ -59,7 +59,7 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        if (isGameProgress) { GameManager.gameMan.NumberofPlayers++; }
+        
         if (SceneManager.GetActiveScene().name == "Multiplayer")
         {
             base.OnServerAddPlayer(conn);

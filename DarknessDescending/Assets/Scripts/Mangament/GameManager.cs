@@ -40,19 +40,14 @@ public class GameManager : NetworkBehaviour
     private List<ConnectionPoint> sectionConnectionPoints = new List<ConnectionPoint>();
     private float gameScale;
 
-
-
-
-    [ServerCallback]
-    public void Awake()
-    {
-        gameMan = this;
-        gameScale = 1;
-        timer = stageEndTimer;
-    }
     [ServerCallback]
     public void Start()
     {
+        if (!NetworkServer.active) { return; }
+        Debug.Log("Isserver");
+        gameMan = this;
+        gameScale = 1;
+        timer = stageEndTimer;
         UIDeadPlayers = NetworkMan.Players.Count;
         hubFloor.collectObjects = CollectObjects.Children;
         StartGame();
@@ -60,6 +55,7 @@ public class GameManager : NetworkBehaviour
     [ServerCallback]
     public void Update()
     {
+        NumberofPlayers = NetworkMan.Players.Count;
         noiseTimer += Time.deltaTime;
         int check = Random.Range(Mathf.FloorToInt(noiseTimer), 101);
         if(check == 100)
@@ -212,6 +208,7 @@ public class GameManager : NetworkBehaviour
         RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
         foreach (NetworkConnection conn in NetworkMan.Players)
         {
+            Debug.Log(conn);
             TgtAllowPlayer(conn);
         }
         currentStageNumber += 1;
@@ -278,6 +275,7 @@ public class GameManager : NetworkBehaviour
     [TargetRpc]
     private void TgtAllowPlayer(NetworkConnection player)
     {
+        Debug.Log("PlayersAllow");
         player.identity.gameObject.GetComponent<Player>().SeeMove();
     }
     [TargetRpc]

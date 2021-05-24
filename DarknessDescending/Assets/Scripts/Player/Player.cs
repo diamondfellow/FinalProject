@@ -24,12 +24,12 @@ public class Player : NetworkBehaviour
 
     private float footstepTimer;
     [ClientCallback]
-    private void Awake()
+    private void Start()
     {
         mainCam = Camera.main;
         if (!hasAuthority)
         {
-
+            GetComponent<AudioListener>().enabled = false;
         }
     }
 
@@ -56,11 +56,11 @@ public class Player : NetworkBehaviour
 
         
         #region Interact
-        if (Input.GetKeyUp(KeyCode.E))
+        if (Input.GetKeyUp(KeyCode.E)&& !isDead)
         {
             Ray CameraRay = Camera.main.ScreenPointToRay(new Vector2(Screen.width / 2, Screen.height / 2));
             RaycastHit hit;
-            if (Physics.Raycast(CameraRay, out hit))
+            if (Physics.Raycast(CameraRay, out hit, interactDistance))
             {
                 Interactables objectInteract;
                 if (hit.collider.transform.gameObject.TryGetComponent<Interactables>(out objectInteract))
@@ -69,7 +69,7 @@ public class Player : NetworkBehaviour
                 }
             }
         }
-        if (Input.GetKeyDown(KeyCode.F))
+        if (Input.GetKeyDown(KeyCode.F) && !isDead)
         {
             CmdFlashligt();
         }
@@ -153,12 +153,17 @@ public class Player : NetworkBehaviour
             isDead = true;
             loadingCanvas.SetActive(true);
             DeathImage.SetActive(true);
+            if (headlamp.enabled)
+            {
+                RpcFlashlight();
+            }
             RpcKillPlayer();
         }
     }
     [ClientRpc]
     public void RpcKillPlayer()
     {
+        Debug.Log("RpcKoll");
         gameObject.GetComponent<Rigidbody>().useGravity = false;
         gameObject.GetComponent<MeshRenderer>().enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
@@ -181,7 +186,7 @@ public class Player : NetworkBehaviour
         {
             GameManager.gameMan.RpcPlaySound(gameObject, "FlashlightOn");
         }
-        headlamp.enabled = !headlamp.enabled;
+
     }
     #endregion
     #region UICode
@@ -207,7 +212,14 @@ public class Player : NetworkBehaviour
     [Client]
     public void LeaveGame()
     {
-        GetComponent<NetworkIdentity>().connectionToServer.Disconnect();
+        if(NetworkServer.active && NetworkClient.isConnected)
+        {
+            NetworkMan.singleton.StopHost();
+        }
+        else
+        {
+            NetworkManager.singleton.StopClient();
+        }
     }
     [Client]
     public void Settings()

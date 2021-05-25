@@ -80,7 +80,7 @@ public class NetworkMan : NetworkManager
     {
         if(newSceneName == "MainMenu")
         {
-
+            SceneManager.LoadScene(0);
         }
     }
 }

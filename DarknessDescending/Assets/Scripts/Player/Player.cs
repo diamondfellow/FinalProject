@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-
+using UnityEngine.SceneManagement;
 public class Player : NetworkBehaviour
 {
     [SerializeField] private float interactDistance;
-    [SerializeField] private Light headlamp;
 
     public bool canMove = false;
     public bool spectate = false;
@@ -20,15 +19,21 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject DeathImage;
     [SerializeField] private Canvas pauseMenu;
     [SerializeField] private float footstepTimerCheck;
+    [SerializeField] private Camera cameraRef;
 
 
     private float footstepTimer;
     [ClientCallback]
     private void Start()
     {
-        mainCam = Camera.main;
+
+        mainCam = cameraRef;
         if (!hasAuthority)
         {
+            Destroy(mainCam.gameObject);
+            Destroy(loadingCanvas.gameObject);
+            Destroy(DeathImage.gameObject);
+            Destroy(pauseMenu.gameObject);
             GetComponent<AudioListener>().enabled = false;
         }
     }
@@ -37,7 +42,7 @@ public class Player : NetworkBehaviour
     private void Update()
     {
         if (!hasAuthority) { return; }
-
+        Debug.Log("Testing");
         if (Input.GetKeyDown(KeyCode.Escape) && isPaused)
         {
             ClosePause();
@@ -69,13 +74,8 @@ public class Player : NetworkBehaviour
                 }
             }
         }
-        if (Input.GetKeyDown(KeyCode.F) && !isDead)
-        {
-            CmdFlashligt();
-        }
         #endregion
         #region lookcode
-        //if (!hasAuthority) { return; }
         //Left to right Camera
         Vector3 playerRotation = gameObject.transform.rotation.eulerAngles;
         playerRotation.y += (lookSpeed * Input.GetAxis("Mouse X") * Time.deltaTime);
@@ -93,8 +93,11 @@ public class Player : NetworkBehaviour
             cameraRotation.x = 80;
         }
         Quaternion transferUpDown = Quaternion.Euler(cameraRotation);
+        Debug.Log(transferUpDown);
+        Debug.Log(mainCam.transform.rotation);
         mainCam.transform.rotation = transferUpDown;
         #endregion
+
         #region Move
         float horiInput = Input.GetAxis("Horizontal");
         float vertInput = Input.GetAxis("Vertical");
@@ -153,41 +156,18 @@ public class Player : NetworkBehaviour
             isDead = true;
             loadingCanvas.SetActive(true);
             DeathImage.SetActive(true);
-            if (headlamp.enabled)
-            {
-                RpcFlashlight();
-            }
             RpcKillPlayer();
         }
     }
     [ClientRpc]
     public void RpcKillPlayer()
     {
-        Debug.Log("RpcKoll");
         gameObject.GetComponent<Rigidbody>().useGravity = false;
         gameObject.GetComponent<MeshRenderer>().enabled = false;
         gameObject.GetComponent<CapsuleCollider>().enabled = false;
     }
     #endregion
     #region FlashLight
-    [Command]
-    private void CmdFlashligt()
-    {
-        RpcFlashlight();
-    }
-    [ClientRpc]
-    private void RpcFlashlight()
-    {
-        if (headlamp.enabled)
-        {
-            GameManager.gameMan.RpcPlaySound(gameObject, "FlashlightOff");
-        }
-        else
-        {
-            GameManager.gameMan.RpcPlaySound(gameObject, "FlashlightOn");
-        }
-
-    }
     #endregion
     #region UICode
     [Client]
@@ -214,11 +194,13 @@ public class Player : NetworkBehaviour
     {
         if(NetworkServer.active && NetworkClient.isConnected)
         {
+            SceneManager.MoveGameObjectToScene(NetworkMan.singleton.gameObject, SceneManager.GetActiveScene());
             NetworkMan.singleton.StopHost();
         }
         else
         {
             NetworkManager.singleton.StopClient();
+            SceneManager.MoveGameObjectToScene(NetworkMan.singleton.gameObject, SceneManager.GetActiveScene());
         }
     }
     [Client]

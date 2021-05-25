@@ -9,7 +9,7 @@ public class Enemies : NetworkBehaviour
     public NavMeshAgent navAgent;
     public float moveSpeed;
     public float turnSpeed;
-    [Server]
+    [ServerCallback]
     public void Awake()
     {
         navAgent = gameObject.GetComponent<NavMeshAgent>();

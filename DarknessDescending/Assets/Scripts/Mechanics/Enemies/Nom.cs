@@ -14,7 +14,7 @@ public class Nom : Enemies
 
     private float playerDistance = 1000f;
     private GameObject playerHolder;
-    [Server]
+    [ServerCallback]
     private void Update()
     {
         if (!navAgent.isOnNavMesh) { return; }
@@ -57,7 +57,6 @@ public class Nom : Enemies
         NavMeshHit hit;
         NavMesh.SamplePosition(randomPoint.transform.position, out hit, 2, 1);
         Vector3 movePosition = hit.position;
-        Debug.Log(movePosition);
         Move(movePosition);
     }
     /*

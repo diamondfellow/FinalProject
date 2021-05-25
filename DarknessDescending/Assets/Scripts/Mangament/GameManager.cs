@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : NetworkBehaviour
 {
@@ -44,7 +45,6 @@ public class GameManager : NetworkBehaviour
     public void Start()
     {
         if (!NetworkServer.active) { return; }
-        Debug.Log("Isserver");
         gameMan = this;
         gameScale = 1;
         timer = stageEndTimer;
@@ -119,7 +119,8 @@ public class GameManager : NetworkBehaviour
     [Server]
     private void BackToLobby()
     {
-        NetworkManager.singleton.ServerChangeScene("MainMenu");
+        SceneManager.MoveGameObjectToScene(NetworkMan.singleton.gameObject, SceneManager.GetActiveScene());
+        NetworkMan.singleton.StopHost();
     }
     [Command]
     public void CmdDeathBackLobby(GameObject button)
@@ -208,7 +209,7 @@ public class GameManager : NetworkBehaviour
         RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
         foreach (NetworkConnection conn in NetworkMan.Players)
         {
-            Debug.Log(conn);
+            Debug.Log(conn.identity.gameObject);
             TgtAllowPlayer(conn);
         }
         currentStageNumber += 1;
@@ -352,6 +353,8 @@ public class GameManager : NetworkBehaviour
         ConnectionPoint nextPointToPlace = sectionConnectionPoints[Random.Range(0, sectionConnectionPoints.Count)];
         GameObject newPath = Instantiate(FloorList.floorList.RandomFloorObject(stageFloorType), hubFloor.gameObject.transform);
         NetworkServer.Spawn(newPath);
+        RpcSetPathAsChild(newPath);
+
         newPath.transform.localPosition = Vector3.zero;
         Vector3 transfer = newPath.transform.localRotation.eulerAngles;
         transfer = new Vector3(transfer.x, 0, 0);
@@ -377,7 +380,19 @@ public class GameManager : NetworkBehaviour
 
         newPathConnPoint.gameObject.SetActive(false);
         sectionConnectionPoints.Remove(newPathConnPoint);
+        RpcSetConnPoints(nextPointToPlace.gameObject, newPathConnPoint.gameObject);
         return;
+    }
+    [ClientRpc]
+    private void RpcSetPathAsChild(GameObject pathToChild)
+    {
+        pathToChild.transform.parent = hubFloor.gameObject.transform;
+    }
+    [ClientRpc]
+    private void RpcSetConnPoints(GameObject nextConnPoint, GameObject newConnPoint)
+    {
+        nextConnPoint.SetActive(false);
+        newConnPoint.SetActive(false);
     }
     [Server]
     bool NewPathOverlap(Pathway newPath)

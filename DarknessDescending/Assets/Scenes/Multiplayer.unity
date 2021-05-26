@@ -1237,6 +1237,12 @@ MonoBehaviour:
   hubFloor: {fileID: 1331794218}
   gameScaling: 0.1
   stageEndTimer: 20
+  pathLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  playerMask:
+    serializedVersion: 2
+    m_Bits: 128
   allStagePathways: []
 --- !u!114 &422648972
 MonoBehaviour:

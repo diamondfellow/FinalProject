@@ -202,6 +202,7 @@ GameObject:
   - component: {fileID: 4649489205505059038}
   - component: {fileID: 3635559776138394323}
   - component: {fileID: 3432456093853535114}
+  - component: {fileID: 965462206720134221}
   m_Layer: 6
   m_Name: NormalHallway
   m_TagString: Untagged
@@ -350,6 +351,20 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 6416302070336371891, guid: 5e1843b2939d77045bde6d1e73d8a805, type: 3}
+--- !u!114 &965462206720134221
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3340752197799300471}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b42b59ae776f57345869f90f38bd9e97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!1 &3746639172456669383
 GameObject:
   m_ObjectHideFlags: 0

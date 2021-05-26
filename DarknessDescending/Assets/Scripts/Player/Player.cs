@@ -42,7 +42,6 @@ public class Player : NetworkBehaviour
     private void Update()
     {
         if (!hasAuthority) { return; }
-        Debug.Log("Testing");
         if (Input.GetKeyDown(KeyCode.Escape) && isPaused)
         {
             ClosePause();
@@ -93,8 +92,6 @@ public class Player : NetworkBehaviour
             cameraRotation.x = 80;
         }
         Quaternion transferUpDown = Quaternion.Euler(cameraRotation);
-        Debug.Log(transferUpDown);
-        Debug.Log(mainCam.transform.rotation);
         mainCam.transform.rotation = transferUpDown;
         #endregion
 

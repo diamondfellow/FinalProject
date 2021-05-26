@@ -12,7 +12,7 @@ public class Nom : Enemies
     private bool isPointClosed;
     private List<GameObject> playersNear = new List<GameObject>();
 
-    private float playerDistance = 1000f;
+    //private float playerDistance = 1000f;
     private GameObject playerHolder;
     [ServerCallback]
     private void Update()

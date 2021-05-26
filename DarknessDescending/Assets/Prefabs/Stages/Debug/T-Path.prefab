@@ -686,6 +686,7 @@ GameObject:
   - component: {fileID: 1377817340488719354}
   - component: {fileID: 968205893612217255}
   - component: {fileID: 672812635557274687}
+  - component: {fileID: 8878847744846562902}
   m_Layer: 6
   m_Name: T-Path
   m_TagString: Untagged
@@ -850,8 +851,22 @@ MeshCollider:
   m_Enabled: 1
   serializedVersion: 4
   m_Convex: 0
-  m_CookingOptions: 30
+  m_CookingOptions: -1
   m_Mesh: {fileID: 6894428203817054813, guid: 9b87c068e11ab9643ba5e91740f7f346, type: 3}
+--- !u!114 &8878847744846562902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7789989761324461670}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b42b59ae776f57345869f90f38bd9e97, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!1 &7834698886779182928
 GameObject:
   m_ObjectHideFlags: 0

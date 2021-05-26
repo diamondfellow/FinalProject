@@ -25,8 +25,8 @@ public class GameManager : NetworkBehaviour
     [SerializeField] private float gameScaling = .1f; //Amount per stage increase in percent .1 - 1;
     [SerializeField] private float stageEndTimer = 20f;
 
-    private LayerMask pathLayerMask;
-    private LayerMask playerMask;
+    [SerializeField] private LayerMask pathLayerMask;
+    [SerializeField] private LayerMask playerMask;
     private int UIDeadPlayers; // used for reurning to lobby when all players are dead
     private float timer;
     private float noiseTimer;
@@ -133,6 +133,7 @@ public class GameManager : NetworkBehaviour
             BackToLobby();
         }
     }
+
     #region Sound
     [ClientRpc]
     public void RpcStopSound(GameObject soundObject)
@@ -209,7 +210,7 @@ public class GameManager : NetworkBehaviour
         RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
         foreach (NetworkConnection conn in NetworkMan.Players)
         {
-            Debug.Log(conn.identity.gameObject);
+
             TgtAllowPlayer(conn);
         }
         currentStageNumber += 1;
@@ -276,7 +277,6 @@ public class GameManager : NetworkBehaviour
     [TargetRpc]
     private void TgtAllowPlayer(NetworkConnection player)
     {
-        Debug.Log("PlayersAllow");
         player.identity.gameObject.GetComponent<Player>().SeeMove();
     }
     [TargetRpc]
@@ -299,8 +299,7 @@ public class GameManager : NetworkBehaviour
         int partsPerSection = 3;
         partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale * NumberofPlayers);
         stageFloorType = Random.Range(1, (FloorList.floorList.numberOfFloorTypes + 1));
-        Debug.Log(partsPerSection);
-         for (int i = 0; i <= 3; i++)
+         for (int i = 0; i <= 0; i++)
          {
                sectionConnectionPoints = new List<ConnectionPoint>();
                switch (i)
@@ -375,24 +374,34 @@ public class GameManager : NetworkBehaviour
         allStagePathways.Add(newPath.GetComponent<Pathway>());
         AddConnectionPoints(newPath.GetComponent<Pathway>());
 
-            nextPointToPlace.gameObject.SetActive(false);
         sectionConnectionPoints.Remove(nextPointToPlace);
-
-        newPathConnPoint.gameObject.SetActive(false);
         sectionConnectionPoints.Remove(newPathConnPoint);
-        RpcSetConnPoints(nextPointToPlace.gameObject, newPathConnPoint.gameObject);
+
+        TurnOffConnPoint(nextPointToPlace.transform.parent.gameObject.GetComponent<Pathway>(), nextPointToPlace);
+        TurnOffConnPoint(newPath.GetComponent<Pathway>(), newPathConnPoint);
+        return;
+    }
+    [Server]
+    private void TurnOffConnPoint(Pathway path, ConnectionPoint connPoint)
+    {
+        int i = -1;
+        foreach(ConnectionPoint connection in path.connectionPoints)
+        {
+            i++;
+            if(connection == connPoint)
+            {
+                path.GetComponent<PathManager>().RpcSetConnPointOff(i);
+                return;
+            }
+        }
+        Debug.Log("Conn Point Not There");
         return;
     }
     [ClientRpc]
     private void RpcSetPathAsChild(GameObject pathToChild)
     {
         pathToChild.transform.parent = hubFloor.gameObject.transform;
-    }
-    [ClientRpc]
-    private void RpcSetConnPoints(GameObject nextConnPoint, GameObject newConnPoint)
-    {
-        nextConnPoint.SetActive(false);
-        newConnPoint.SetActive(false);
+        return;
     }
     [Server]
     bool NewPathOverlap(Pathway newPath)
@@ -400,17 +409,26 @@ public class GameManager : NetworkBehaviour
         Bounds bounds = newPath.PathBounds;
         bounds.Expand(-0.1f);
 
+        
+
         Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size / 2, newPath.transform.rotation, pathLayerMask);
-        if(colliders.Length > 0)
+        Debug.Log(colliders.Length);
+        foreach (Collider coll in colliders)
+        {
+            Debug.Log(coll);
+        }
+        if (colliders.Length > 0)
         {
             foreach(Collider c in colliders)
             {
-                if (c.transform.parent.gameObject.Equals(newPath.gameObject))
+                if (c.gameObject == newPath.gameObject)
                 {
+                    Debug.Log("Contiu");
                     continue;
                 }
                 else
                 {
+                    Debug.Log("Object Not Self");
                     Destroy(newPath.gameObject);
                     NetworkServer.Destroy(newPath.gameObject);
                     return true;
@@ -480,7 +498,7 @@ public class GameManager : NetworkBehaviour
     #endregion
 
     //If more then one puzzle
-    #region PuzzlePlace
+    #region PuzzleProb
 
 
     /* For extraPuzzles

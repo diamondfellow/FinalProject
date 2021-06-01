@@ -62,10 +62,12 @@ public class NetworkMan : NetworkManager
         bool isLobby;
         if (SceneManager.GetActiveScene().name == "Multiplayer")
         {
+            isLobby = false;
             base.OnServerAddPlayer(conn);
         }
         else
         {
+            isLobby = true;
             Transform startPos = GetStartPosition();
             GameObject player = startPos != null
                 ? Instantiate(lobbyPlayer, startPos.position, startPos.rotation)
@@ -73,7 +75,10 @@ public class NetworkMan : NetworkManager
 
             NetworkServer.AddPlayerForConnection(conn, player);
         }
-        
+        if (isLobby)
+        {
+            //PlayerLobby.ClientOnInfoUpdated?.Invoke();
+        }
         
     }
     public override void OnServerChangeScene(string newSceneName)
@@ -83,4 +88,5 @@ public class NetworkMan : NetworkManager
             SceneManager.LoadScene(0);
         }
     }
+   
 }

@@ -143,12 +143,11 @@ public class GameManager : NetworkBehaviour
         button.SetActive(false);
         UIDeadPlayers--;
         RpcUpdatePlayersLeave();
-        if(UIDeadPlayers <= 0)
+        if (UIDeadPlayers <= 0)
         {
             BackToLobby();
         }
     }
-
     #region Sound
     [ClientRpc]
     public void RpcStopSound(GameObject soundObject)
@@ -216,8 +215,6 @@ public class GameManager : NetworkBehaviour
         currentStageNumber = 0;
         StartCoroutine(nameof(BuildMap));
     }
-
-
     // Ran at end of stage building 5
     [Server]
     public void StartStage()
@@ -314,7 +311,7 @@ public class GameManager : NetworkBehaviour
         int partsPerSection = 3;
         partsPerSection = Mathf.CeilToInt(partsPerSection * gameScale * NumberofPlayers);
         stageFloorType = Random.Range(1, (FloorList.floorList.numberOfFloorTypes + 1));
-         for (int i = 0; i <= 0; i++)
+         for (int i = 0; i <= 3; i++)
          {
                sectionConnectionPoints = new List<ConnectionPoint>();
                switch (i)
@@ -367,7 +364,8 @@ public class GameManager : NetworkBehaviour
         ConnectionPoint nextPointToPlace = sectionConnectionPoints[Random.Range(0, sectionConnectionPoints.Count)];
         GameObject newPath = Instantiate(FloorList.floorList.RandomFloorObject(stageFloorType), hubFloor.gameObject.transform);
         NetworkServer.Spawn(newPath);
-        RpcSetPathAsChild(newPath);
+        CallSetTransformParent(newPath);
+    
 
         newPath.transform.localPosition = Vector3.zero;
         Vector3 transfer = newPath.transform.localRotation.eulerAngles;
@@ -379,13 +377,15 @@ public class GameManager : NetworkBehaviour
         
 
         PositionNewPath(newPath, newPathConnPoint ,nextPointToPlace);
-       
+
+        /*
         if (NewPathOverlap(newPath.GetComponent<Pathway>()))
         {
             sectionConnectionPoints.Remove(nextPointToPlace);
-            PlaceFloorObject();
+            
             return;
-        }     
+        }
+        */
         allStagePathways.Add(newPath.GetComponent<Pathway>());
         AddConnectionPoints(newPath.GetComponent<Pathway>());
 
@@ -413,11 +413,10 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Conn Point Not There");
         return;
     }
-    [ClientRpc]
-    private void RpcSetPathAsChild(GameObject pathToChild)
+    [Server]
+    private void CallSetTransformParent(GameObject path)
     {
-        pathToChild.transform.parent = hubFloor.gameObject.transform;
-        return;
+        path.GetComponent<PathManager>().RpcSetParent(hubFloor.gameObject);
     }
     [Server]
     bool NewPathOverlap(Pathway newPath)

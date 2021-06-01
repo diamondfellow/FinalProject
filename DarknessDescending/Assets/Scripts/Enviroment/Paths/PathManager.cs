@@ -11,4 +11,9 @@ public class PathManager : NetworkBehaviour
         GetComponent<Pathway>().connectionPoints[connPointNumber].gameObject.SetActive(false);
 
     }
+    [ClientRpc]
+    public void RpcSetParent(GameObject hubfloor)
+    {
+        gameObject.transform.parent = hubfloor.transform;
+    }
 }

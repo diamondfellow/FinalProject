@@ -59,7 +59,7 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        
+        bool isLobby;
         if (SceneManager.GetActiveScene().name == "Multiplayer")
         {
             base.OnServerAddPlayer(conn);
@@ -73,7 +73,7 @@ public class NetworkMan : NetworkManager
 
             NetworkServer.AddPlayerForConnection(conn, player);
         }
-
+        
         
     }
     public override void OnServerChangeScene(string newSceneName)

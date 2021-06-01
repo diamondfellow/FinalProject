@@ -41,6 +41,11 @@ public class GameManager : NetworkBehaviour
     private List<ConnectionPoint> sectionConnectionPoints = new List<ConnectionPoint>();
     private float gameScale;
 
+    private int totalPuzzlesCompleted = 0;
+    private int MonstersPlaced = 0;
+    private int corridorsplaced = 0;
+    
+
     [ServerCallback]
     public void Start()
     {
@@ -98,7 +103,16 @@ public class GameManager : NetworkBehaviour
         }
         Time.timeScale = 0;
         RpcSetTimeScale(0);
+        RpcSetScoreTexts();
         gameUI.deadUI.SetActive(true);
+    }
+    [ClientRpc]
+    private void RpcSetScoreTexts()
+    {
+        gameUI.corridorsPlacedText.text = "Corridors Placed: " + corridorsplaced;
+        gameUI.stagesCompletedText.text = "Stages Completed: " + currentStageNumber;
+        gameUI.MonstersPlacedText.text = "Number of Monsters: " + MonstersPlaced;
+        gameUI.PuzzlesCleared.text = "Puzzles Completed: " + totalPuzzlesCompleted;
     }
     [Server]
     public void PuzzleComplete(int puzzlesCompleted)
@@ -115,6 +129,7 @@ public class GameManager : NetworkBehaviour
             RpcEndingUpdate(timer);
         }
         RpcUpdatePuzzleUI(puzzlesSolved, puzzlesToBeSolved);
+        totalPuzzlesCompleted++;
     }
     [Server]
     private void BackToLobby()
@@ -379,6 +394,7 @@ public class GameManager : NetworkBehaviour
 
         TurnOffConnPoint(nextPointToPlace.transform.parent.gameObject.GetComponent<Pathway>(), nextPointToPlace);
         TurnOffConnPoint(newPath.GetComponent<Pathway>(), newPathConnPoint);
+        corridorsplaced++;
         return;
     }
     [Server]
@@ -491,6 +507,7 @@ public class GameManager : NetworkBehaviour
             GameObject spawnedMonster = Instantiate(monsterSpawn, allStagePathways[Random.Range(0, allStagePathways.Count)].monsterSpawn.position, Quaternion.identity);
             NetworkServer.Spawn(spawnedMonster);
             allStageMonsters.Add(spawnedMonster);
+            MonstersPlaced ++;
         }
         StartStage();
     }

@@ -16,6 +16,10 @@ public class DoorButton : Interactables
     [SerializeField] private AudioSource doorSound;
     [SerializeField] private bool isCoolDoor;
 
+    [SerializeField] private Color ButtonOn;
+    [SerializeField] private Color ButtonOff;
+    [SerializeField] private GameObject lightObject;
+
 
     private bool isMoving = false;
     private bool isOpen = true;
@@ -33,14 +37,22 @@ public class DoorButton : Interactables
         GameManager.gameMan.RpcPlaySound(buttonClick.gameObject, "ButtonClick");
         if (isOpen && !isMoving)
         {
+            RpcSetColor(ButtonOn);
             StartCoroutine(nameof(Close));
         }
         else if (!isMoving)
         {
+            RpcSetColor(ButtonOff);
             StartCoroutine(nameof(Open));
         }
         return;
     }
+    [ClientRpc]
+    private void RpcSetColor(Color color)
+    {
+        lightObject.GetComponent<MeshRenderer>().material.color = color;
+    }
+
     [Server]
     public IEnumerator Open()
     {

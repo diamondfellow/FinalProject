@@ -7,6 +7,7 @@ using System;
 public class PButton : Puzzle
 {
     public Color onColor;
+    [SerializeField] private GameObject lightObject;
     [Server]
     public override void Interacted()
     {
@@ -18,7 +19,7 @@ public class PButton : Puzzle
     [ClientRpc]
     public void RpcChangeButtonColor()
     {
-        gameObject.GetComponent<MeshRenderer>().material.color = onColor;
+        lightObject.GetComponent<MeshRenderer>().material.color = onColor;
     }
     [Server]
     public void ButtonPressed()

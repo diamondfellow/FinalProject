@@ -2,13 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using System;
 
 public class PlayerLobby : NetworkBehaviour
 {
-    private string username = null;
-    [TargetRpc]
-    private void GetUsernamePref()
+    //[SyncVar(hook =nameof(ClentHandleDisplayNAmeUpdated))]
+    private string displayName;
+
+    public static event Action ClientOnInfoUpdated;
+    /* private static object ClentHandleDisplayNAmeUpdated(string oldDisplayName, string newDisplayName)
     {
-        username = PlayerPrefs.GetString("username");
+        ClientOnInfoUpdated?.Invoke();
+       // return;
     }
+    */
+    [Server]
+    public void SetDisplayName() 
+    {
+
+    }
+
 }

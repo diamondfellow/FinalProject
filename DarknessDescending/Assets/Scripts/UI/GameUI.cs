@@ -10,5 +10,9 @@ public class GameUI : MonoBehaviour
     public Text stageText;
     public GameObject deadUI;
     public Text playersLeave;
-    
+
+    public Text stagesCompletedText;
+    public Text corridorsPlacedText;
+    public Text MonstersPlacedText;
+    public Text PuzzlesCleared;
 }

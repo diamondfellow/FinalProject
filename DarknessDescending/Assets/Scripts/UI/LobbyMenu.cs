@@ -16,13 +16,27 @@ public class LobbyMenu : MonoBehaviour
     {
         NetworkMan.ClientOnConnected += HandleCLientConnected;
         NetworkMan.IsHost += HandleIsHost;
+        PlayerLobby.ClientOnInfoUpdated += HandleClientDisplayNameUpdated;
     }
     private void OnDestroy()
     {
         NetworkMan.ClientOnConnected -= HandleCLientConnected;
         NetworkMan.IsHost -= HandleIsHost;
+        PlayerLobby.ClientOnInfoUpdated -= HandleClientDisplayNameUpdated;
     }
 
+    private void HandleClientDisplayNameUpdated()
+    {
+        List<NetworkConnection> players = NetworkMan.Players;
+        for(int i = 0; i < players.Count; i++)
+        {
+            playerTexts[i].text = players[i].identity.gameObject.GetComponent<PlayerLobby>().GetDisplayName();
+        }
+        for(int i = players.Count; i < playerTexts.Length; i++)
+        {
+            playerTexts[i].text = "Waiting For Player...";
+        }
+    }
     private void HandleUpdateNameUI(string[] nameList)
     {
         if(nameList[0] != "")
@@ -56,7 +70,15 @@ public class LobbyMenu : MonoBehaviour
         startGame.SetActive(false);
         if(NetworkServer.active && NetworkClient.isConnected)
         {
+            foreach(NetworkConnection conn in NetworkMan.Players)
+            {
+                if(conn != NetworkClient.connection)
+                {
+                    conn.identity.gameObject.GetComponent<PlayerLobby>().ForceDisconnect();
+                }
+            }
             NetworkManager.singleton.StopHost();
+            SceneManager.LoadScene(0);
         }
         else
         {

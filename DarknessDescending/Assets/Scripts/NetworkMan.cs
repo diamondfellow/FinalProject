@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using System;
 using UnityEngine.SceneManagement;
+using Steamworks;
 
 public class NetworkMan : NetworkManager
 {
@@ -12,11 +13,12 @@ public class NetworkMan : NetworkManager
     public static event Action IsHost;
     public static List<NetworkConnection> Players  = new List<NetworkConnection>();
 
+
     public GameObject lobbyPlayer;
 
-    private string[] orderedPlayerNames = new string[4];
+    //private string[] orderedPlayerNames = new string[4];
     private bool isGameProgress = false;
-
+   [SerializeField] private bool useSteam = false;
 
     public override void OnServerConnect(NetworkConnection conn)
     {
@@ -29,6 +31,7 @@ public class NetworkMan : NetworkManager
         {
             conn.Disconnect();
         }
+        
     }
     public override void OnServerDisconnect(NetworkConnection conn)
     {
@@ -59,6 +62,7 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
+        Debug.Log("SErverAddPlayer");
         bool isLobby;
         if (SceneManager.GetActiveScene().name == "Multiplayer")
         {
@@ -73,11 +77,16 @@ public class NetworkMan : NetworkManager
                 ? Instantiate(lobbyPlayer, startPos.position, startPos.rotation)
                 : Instantiate(lobbyPlayer);
 
-            NetworkServer.AddPlayerForConnection(conn, player);
+            NetworkServer.AddPlayerForConnection(conn, player);          
+            
         }
-        if (isLobby)
+        if (isLobby && useSteam)
         {
-            //PlayerLobby.ClientOnInfoUpdated?.Invoke();
+            conn.identity.gameObject.GetComponent<PlayerLobby>().SetDisplayNameSteam();
+        }
+        else if (isLobby)
+        {
+            conn.identity.gameObject.GetComponent<PlayerLobby>().SetDisplayName("Player " + Players.Count);
         }
         
     }

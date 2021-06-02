@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: 69144178}
   - component: {fileID: 69144177}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -537,8 +537,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -53.1, y: 11.5}
-  m_SizeDelta: {x: -58, y: -30}
+  m_AnchoredPosition: {x: -19.194994, y: 11.5}
+  m_SizeDelta: {x: -125.80999, y: -30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &69144177
 MonoBehaviour:
@@ -567,7 +567,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 48
-    m_Alignment: 0
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
@@ -2467,7 +2467,7 @@ GameObject:
   - component: {fileID: 1245141057}
   - component: {fileID: 1245141056}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2489,8 +2489,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -18, y: 0.0000019073486}
-  m_SizeDelta: {x: -50.1955, y: -28.2364}
+  m_AnchoredPosition: {x: -18.048874, y: 0.0000019073486}
+  m_SizeDelta: {x: -50.097748, y: -28.2364}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1245141056
 MonoBehaviour:
@@ -3213,9 +3213,9 @@ MonoBehaviour:
   startGame: {fileID: 505579348}
   playerTexts:
   - {fileID: 1245141056}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 1897112900}
+  - {fileID: 2043355578}
+  - {fileID: 69144177}
 --- !u!1 &1684220348
 GameObject:
   m_ObjectHideFlags: 0
@@ -3388,7 +3388,7 @@ GameObject:
   - component: {fileID: 1897112901}
   - component: {fileID: 1897112900}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3410,8 +3410,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -52.1, y: 7.1}
-  m_SizeDelta: {x: -58, y: -30}
+  m_AnchoredPosition: {x: -18.694994, y: 7.1}
+  m_SizeDelta: {x: -124.80999, y: -30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1897112900
 MonoBehaviour:
@@ -3440,7 +3440,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 48
-    m_Alignment: 0
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1
@@ -3689,6 +3689,7 @@ MonoBehaviour:
   - {fileID: 3778819828870604307, guid: 92d4cdfc5b47a9846be609f6c76e7cf5, type: 3}
   - {fileID: 6990067489028421186, guid: 65b68ff695342914ba1ca710c1e973de, type: 3}
   lobbyPlayer: {fileID: 4164738693002513600, guid: bd323b5c73d83f341a3fea848d2cf88f, type: 3}
+  useSteam: 0
 --- !u!4 &1953227663
 Transform:
   m_ObjectHideFlags: 0
@@ -3744,7 +3745,7 @@ GameObject:
   - component: {fileID: 2043355579}
   - component: {fileID: 2043355578}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Text3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3766,8 +3767,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -52.1, y: 10.6}
-  m_SizeDelta: {x: -58, y: -30}
+  m_AnchoredPosition: {x: -18.694994, y: 10.6}
+  m_SizeDelta: {x: -124.80999, y: -30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &2043355578
 MonoBehaviour:
@@ -3796,7 +3797,7 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 0
     m_MaxSize: 48
-    m_Alignment: 0
+    m_Alignment: 1
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 1

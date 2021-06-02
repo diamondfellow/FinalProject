@@ -21,6 +21,7 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
+        
         if (NetworkManager.singleton.isNetworkActive)
         {
             mainMenu.SetActive(false);

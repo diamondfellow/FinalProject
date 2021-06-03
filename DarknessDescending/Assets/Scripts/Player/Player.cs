@@ -80,9 +80,11 @@ public class Player : NetworkBehaviour
         playerRotation.y += (lookSpeed * Input.GetAxis("Mouse X") * Time.deltaTime);
         Quaternion transfer = Quaternion.Euler(playerRotation);
         gameObject.transform.rotation = transfer;
+
         // Up and Down Camera
         Vector3 cameraRotation = mainCam.transform.rotation.eulerAngles;
         cameraRotation.x += -(lookSpeed * Input.GetAxis("Mouse Y") * Time.deltaTime);
+
         if (cameraRotation.x > 85 && cameraRotation.x < 300)
         {
             cameraRotation.x = 300;
@@ -194,10 +196,10 @@ public class Player : NetworkBehaviour
             SceneManager.MoveGameObjectToScene(NetworkMan.singleton.gameObject, SceneManager.GetActiveScene());
             NetworkMan.singleton.StopHost();
         }
-        else
+        else if(NetworkClient.isConnected)
         {
-            NetworkManager.singleton.StopClient();
             SceneManager.MoveGameObjectToScene(NetworkMan.singleton.gameObject, SceneManager.GetActiveScene());
+            NetworkManager.singleton.StopClient();
         }
     }
     [Client]

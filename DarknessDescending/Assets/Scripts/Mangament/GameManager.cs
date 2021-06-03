@@ -357,44 +357,48 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void PlaceFloorObject()
     {
-        if(sectionConnectionPoints.Count == 0)
+        bool roomPlaced = false;
+        if (sectionConnectionPoints.Count == 0)
         {
             return;
         }
-        ConnectionPoint nextPointToPlace = sectionConnectionPoints[Random.Range(0, sectionConnectionPoints.Count)];
         GameObject newPath = Instantiate(FloorList.floorList.RandomFloorObject(stageFloorType), hubFloor.gameObject.transform);
         NetworkServer.Spawn(newPath);
         CallSetTransformParent(newPath);
-    
 
         newPath.transform.localPosition = Vector3.zero;
         Vector3 transfer = newPath.transform.localRotation.eulerAngles;
         transfer = new Vector3(transfer.x, 0, 0);
         newPath.transform.localRotation = Quaternion.Euler(transfer);
 
-        ConnectionPoint newPathConnPoint = newPath.GetComponent<Pathway>().connectionPoints
-            [Random.Range(0, newPath.GetComponent<Pathway>().connectionPoints.Length)];
-        
-
-        PositionNewPath(newPath, newPathConnPoint ,nextPointToPlace);
-
-        /*
-        if (NewPathOverlap(newPath.GetComponent<Pathway>()))
+        foreach (ConnectionPoint placedPoint in sectionConnectionPoints)
         {
-            sectionConnectionPoints.Remove(nextPointToPlace);
-            
-            return;
+            foreach (ConnectionPoint newPathPoint in newPath.GetComponent<Pathway>().connectionPoints)
+            {
+                if (PositionNewPath(newPath, newPathPoint, placedPoint))
+                {
+                    continue;
+                }
+                roomPlaced = true;
+                allStagePathways.Add(newPath.GetComponent<Pathway>());
+                AddConnectionPoints(newPath.GetComponent<Pathway>());
+                sectionConnectionPoints.Remove(placedPoint);
+                sectionConnectionPoints.Remove(newPathPoint);
+
+                TurnOffConnPoint(placedPoint.transform.parent.gameObject.GetComponent<Pathway>(), placedPoint);
+                TurnOffConnPoint(newPath.GetComponent<Pathway>(), newPathPoint);
+                corridorsplaced++;
+                break;
+            }
+            if (roomPlaced)
+            {
+                break;
+            }
         }
-        */
-        allStagePathways.Add(newPath.GetComponent<Pathway>());
-        AddConnectionPoints(newPath.GetComponent<Pathway>());
+        if (!roomPlaced)
+        {
 
-        sectionConnectionPoints.Remove(nextPointToPlace);
-        sectionConnectionPoints.Remove(newPathConnPoint);
-
-        TurnOffConnPoint(nextPointToPlace.transform.parent.gameObject.GetComponent<Pathway>(), nextPointToPlace);
-        TurnOffConnPoint(newPath.GetComponent<Pathway>(), newPathConnPoint);
-        corridorsplaced++;
+        }
         return;
     }
     [Server]
@@ -418,16 +422,19 @@ public class GameManager : NetworkBehaviour
     {
         path.GetComponent<PathManager>().RpcSetParent(hubFloor.gameObject);
     }
+    int debugger = 0;
     [Server]
     bool NewPathOverlap(Pathway newPath)
     {
-        Bounds bounds = newPath.PathBounds;
-        bounds.Expand(-0.1f);
+        Debug.Break();
+        Debug.Log(debugger);
+        debugger++;
+        GameObject pathCollider = newPath.transform.Find("PathColl").gameObject;
 
-        
+        Bounds bounds = pathCollider.GetComponent<BoxCollider>().bounds;
+   
 
-        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size / 2, newPath.transform.rotation, pathLayerMask);
-        Debug.Log(colliders.Length);
+        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size/4, pathCollider.transform.rotation, pathLayerMask);
         foreach (Collider coll in colliders)
         {
             Debug.Log(coll);
@@ -436,14 +443,12 @@ public class GameManager : NetworkBehaviour
         {
             foreach(Collider c in colliders)
             {
-                if (c.gameObject == newPath.gameObject)
+                if (c.gameObject == pathCollider.gameObject)
                 {
-                    Debug.Log("Contiu");
                     continue;
                 }
                 else
                 {
-                    Debug.Log("Object Not Self");
                     Destroy(newPath.gameObject);
                     NetworkServer.Destroy(newPath.gameObject);
                     return true;
@@ -453,7 +458,7 @@ public class GameManager : NetworkBehaviour
         return false;
     }
     [Server]
-    private void PositionNewPath(GameObject newPath, ConnectionPoint currentPoint, ConnectionPoint pointToPlace)
+    private bool PositionNewPath(GameObject newPath, ConnectionPoint currentPoint, ConnectionPoint pointToPlace)
     {
 
         Vector3 pointToPlaceEuler = pointToPlace.transform.eulerAngles;
@@ -464,14 +469,15 @@ public class GameManager : NetworkBehaviour
 
         Vector3 pathPositionOffset = currentPoint.transform.position - newPath.transform.position;
         newPath.transform.position = pointToPlace.transform.position - pathPositionOffset;
-        return;
+        return NewPathOverlap(newPath.GetComponent<Pathway>());
     }
     [Server]
     private void AddConnectionPoints(Pathway pathway)
     {
         foreach(ConnectionPoint connpoint in pathway.connectionPoints)
         {
-            sectionConnectionPoints.Add(connpoint);          
+            int r = Random.Range(0, pathway.connectionPoints.Length);
+            sectionConnectionPoints.Insert(r, connpoint);          
         }
         return;
     }

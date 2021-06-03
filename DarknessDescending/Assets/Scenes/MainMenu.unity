@@ -3688,7 +3688,8 @@ MonoBehaviour:
   - {fileID: 352265698997276475, guid: 4d56a2a04a1faa9479a98d81c9280d0a, type: 3}
   - {fileID: 3778819828870604307, guid: 92d4cdfc5b47a9846be609f6c76e7cf5, type: 3}
   - {fileID: 6990067489028421186, guid: 65b68ff695342914ba1ca710c1e973de, type: 3}
-  lobbyPlayer: {fileID: 4164738693002513600, guid: bd323b5c73d83f341a3fea848d2cf88f, type: 3}
+  lobbyPlayers: []
+  lobbyPlayerGO: {fileID: 4164738693002513600, guid: bd323b5c73d83f341a3fea848d2cf88f, type: 3}
   useSteam: 0
 --- !u!4 &1953227663
 Transform:

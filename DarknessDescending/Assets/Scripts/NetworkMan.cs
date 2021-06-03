@@ -4,7 +4,6 @@ using UnityEngine;
 using Mirror;
 using System;
 using UnityEngine.SceneManagement;
-using Steamworks;
 
 public class NetworkMan : NetworkManager
 {
@@ -12,9 +11,9 @@ public class NetworkMan : NetworkManager
     public static event Action ClientOnDisConnected;
     public static event Action IsHost;
     public static List<NetworkConnection> Players  = new List<NetworkConnection>();
+    public List<PlayerLobby> lobbyPlayers = new List<PlayerLobby>();
 
-
-    public GameObject lobbyPlayer;
+    public GameObject lobbyPlayerGO;
 
     //private string[] orderedPlayerNames = new string[4];
     private bool isGameProgress = false;
@@ -36,8 +35,13 @@ public class NetworkMan : NetworkManager
     public override void OnServerDisconnect(NetworkConnection conn)
     {
         if(isGameProgress) { GameManager.gameMan.NumberofPlayers--; }
-        base.OnServerDisconnect(conn);
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+
+            lobbyPlayers.Remove(conn.identity.gameObject.GetComponent<PlayerLobby>());
+        }
         Players.Remove(conn);
+        base.OnServerDisconnect(conn);
     }
     public override void OnStopServer()
     {
@@ -62,7 +66,6 @@ public class NetworkMan : NetworkManager
     }
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
-        Debug.Log("SErverAddPlayer");
         bool isLobby;
         if (SceneManager.GetActiveScene().name == "Multiplayer")
         {
@@ -74,11 +77,15 @@ public class NetworkMan : NetworkManager
             isLobby = true;
             Transform startPos = GetStartPosition();
             GameObject player = startPos != null
-                ? Instantiate(lobbyPlayer, startPos.position, startPos.rotation)
-                : Instantiate(lobbyPlayer);
+                ? Instantiate(lobbyPlayerGO, startPos.position, startPos.rotation)
+                : Instantiate(lobbyPlayerGO);
 
             NetworkServer.AddPlayerForConnection(conn, player);          
             
+        }
+        if (isLobby)
+        {
+            lobbyPlayers.Add(conn.identity.gameObject.GetComponent<PlayerLobby>());
         }
         if (isLobby && useSteam)
         {

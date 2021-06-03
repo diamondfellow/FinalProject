@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class PlayerLobby : NetworkBehaviour
 {
     public List<NetworkConnection> players = new List<NetworkConnection>();
-    [SerializeField] private bool useSteam = false;
+    //[SerializeField] private bool useSteam = false;
     [SyncVar(hook =nameof(ClentHandleDisplayNAmeUpdated))]
     private string displayName;
 
@@ -41,13 +41,19 @@ public class PlayerLobby : NetworkBehaviour
     }
     public override void OnStartClient()
     {
-        NetworkMan.Players.Add(NetworkClient.connection);
-        Debug.Log(NetworkMan.Players);
+        if (!NetworkServer.active)
+        {
+            ((NetworkMan)NetworkManager.singleton).lobbyPlayers.Add(this);
+        }
+
         base.OnStartClient();
     }
     public override void OnStopClient()
     {
-        NetworkMan.Players.Remove(NetworkClient.connection);
+        if (!NetworkServer.active)
+        {
+            ((NetworkMan)NetworkManager.singleton).lobbyPlayers.Remove(this);
+        }
         ClientOnInfoUpdated?.Invoke();
         base.OnStopClient();
     }

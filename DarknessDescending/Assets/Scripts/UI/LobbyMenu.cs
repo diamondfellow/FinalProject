@@ -27,10 +27,10 @@ public class LobbyMenu : MonoBehaviour
 
     private void HandleClientDisplayNameUpdated()
     {
-        List<NetworkConnection> players = NetworkMan.Players;
+        List<PlayerLobby> players = ((NetworkMan)NetworkManager.singleton).lobbyPlayers;
         for(int i = 0; i < players.Count; i++)
         {
-            playerTexts[i].text = players[i].identity.gameObject.GetComponent<PlayerLobby>().GetDisplayName();
+            playerTexts[i].text = players[i].GetDisplayName();
         }
         for(int i = players.Count; i < playerTexts.Length; i++)
         {

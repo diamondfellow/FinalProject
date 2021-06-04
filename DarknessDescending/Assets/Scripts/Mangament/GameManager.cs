@@ -65,7 +65,12 @@ public class GameManager : NetworkBehaviour
         int check = Random.Range(Mathf.FloorToInt(noiseTimer), 101);
         if(check == 100)
         {
-
+            /*
+            Debug.Log(noiseTimer);
+            Debug.Log(check);
+            Debug.Log("Play Noise to Random Player");
+            */
+            noiseTimer = 0;
         }
         //NumberofPlayers = 
         if (stageEnding)
@@ -357,7 +362,8 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void PlaceFloorObject()
     {
-        bool roomPlaced = false;
+        bool roomPlaced;
+        roomPlaced = false;
         if (sectionConnectionPoints.Count == 0)
         {
             return;
@@ -397,7 +403,9 @@ public class GameManager : NetworkBehaviour
         }
         if (!roomPlaced)
         {
-
+            Debug.Log("RoomDestroyed");
+            Destroy(newPath);
+            NetworkServer.Destroy(newPath);
         }
         return;
     }
@@ -426,19 +434,19 @@ public class GameManager : NetworkBehaviour
     [Server]
     bool NewPathOverlap(Pathway newPath)
     {
-        Debug.Break();
+        //Debug.Break();
         Debug.Log(debugger);
         debugger++;
         GameObject pathCollider = newPath.transform.Find("PathColl").gameObject;
-
         Bounds bounds = pathCollider.GetComponent<BoxCollider>().bounds;
-   
 
-        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size/4, pathCollider.transform.rotation, pathLayerMask);
+        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size/2, pathCollider.transform.rotation, pathLayerMask);
+
         foreach (Collider coll in colliders)
         {
             Debug.Log(coll);
         }
+
         if (colliders.Length > 0)
         {
             foreach(Collider c in colliders)
@@ -449,12 +457,12 @@ public class GameManager : NetworkBehaviour
                 }
                 else
                 {
-                    Destroy(newPath.gameObject);
-                    NetworkServer.Destroy(newPath.gameObject);
+                    Debug.Log("Collision");
                     return true;
                 }
             }
         }
+        Debug.Log("NoColl");
         return false;
     }
     [Server]
@@ -465,7 +473,7 @@ public class GameManager : NetworkBehaviour
         Vector3 currentPointEuler = currentPoint.transform.eulerAngles;
         float deltaAngle = Mathf.DeltaAngle(currentPointEuler.y, pointToPlaceEuler.y);
         Quaternion currentPathTargetRotation = Quaternion.AngleAxis(deltaAngle, Vector3.up);
-        newPath.transform.rotation = currentPathTargetRotation * Quaternion.Euler(90f, 90f, 0);
+        newPath.transform.rotation = currentPathTargetRotation * Quaternion.Euler(270f, 90f, 0f);
 
         Vector3 pathPositionOffset = currentPoint.transform.position - newPath.transform.position;
         newPath.transform.position = pointToPlace.transform.position - pathPositionOffset;
@@ -476,7 +484,7 @@ public class GameManager : NetworkBehaviour
     {
         foreach(ConnectionPoint connpoint in pathway.connectionPoints)
         {
-            int r = Random.Range(0, pathway.connectionPoints.Length);
+            int r = Random.Range(0, sectionConnectionPoints.Count);
             sectionConnectionPoints.Insert(r, connpoint);          
         }
         return;

@@ -10,6 +10,14 @@ public class JoinLobbyMenu : MonoBehaviour
     [SerializeField] private InputField addressInput;
     [SerializeField] private Button joinButton;
 
+    public static bool joinMenuOpen = false;
+    private void Update()
+    {
+        if (Input.GetKeyUp(KeyCode.Return) && joinMenuOpen)
+        {
+            Join();
+        }
+    }
     private void OnEnable()
     {
         NetworkMan.ClientOnConnected += HandleClientConnected;
@@ -17,10 +25,11 @@ public class JoinLobbyMenu : MonoBehaviour
     }
     private void OnDisable()
     {
+        joinMenuOpen = false;
         NetworkMan.ClientOnConnected -= HandleClientConnected;
         NetworkMan.ClientOnDisConnected -= HandleClientDisconnected;
     }
-
+    
     public void Join()
     {
         string address = addressInput.text;

@@ -86,6 +86,7 @@ public class MainMenu : MonoBehaviour
     {
         mainMenu.SetActive(false);
         addressUI.SetActive(true);
+        JoinLobbyMenu.joinMenuOpen = true;
     }
   
 }

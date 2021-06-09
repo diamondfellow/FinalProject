@@ -325,34 +325,30 @@ public class GameManager : NetworkBehaviour
                      for (int i1 = 0; i1 < partsPerSection; i1++)
                      {
                         if(i1 == 0) { AddConnectionPoints(FrontStart); }
-                         PlaceFloorObject();
-                         yield return interval;
+                         yield return StartCoroutine(PlaceFloorObject());
                      }
                      break;
                      case 1:
                      for (int i1 = 0; i1 < partsPerSection; i1++)
                      {
                         if (i1 == 0) { AddConnectionPoints(RightStart); }
-                        PlaceFloorObject();
-                         yield return interval;
-                     }
+                        yield return StartCoroutine(PlaceFloorObject());
+                    }
                      break;
                      case 2:
                      for (int i1 = 0; i1 < partsPerSection; i1++)
                      {
                         if (i1 == 0) { AddConnectionPoints(LeftStart); }
-                        PlaceFloorObject();
-                         yield return interval;
+                        yield return StartCoroutine(PlaceFloorObject());
 
-                     }
+                    }
                      break;
                      case 3:
                      for (int i1 = 0; i1 < partsPerSection; i1++)
                      {
                         if (i1 == 0) { AddConnectionPoints(BackStart); }
-                        PlaceFloorObject();
-                         yield return interval;
-                     }
+                        yield return StartCoroutine(PlaceFloorObject());
+                    }
                      break;
                }          
          }
@@ -360,13 +356,13 @@ public class GameManager : NetworkBehaviour
     }
     //Picks random object to place and snaps it to random open space. 2
     [Server]
-    public void PlaceFloorObject()
+    IEnumerator PlaceFloorObject()
     {
         bool roomPlaced;
         roomPlaced = false;
         if (sectionConnectionPoints.Count == 0)
         {
-            return;
+            yield break;
         }
         GameObject newPath = Instantiate(FloorList.floorList.RandomFloorObject(stageFloorType), hubFloor.gameObject.transform);
         NetworkServer.Spawn(newPath);
@@ -381,7 +377,12 @@ public class GameManager : NetworkBehaviour
         {
             foreach (ConnectionPoint newPathPoint in newPath.GetComponent<Pathway>().connectionPoints)
             {
-                if (PositionNewPath(newPath, newPathPoint, placedPoint))
+                PositionNewPath(newPath, newPathPoint, placedPoint);
+                yield return new WaitForFixedUpdate();
+                yield return new WaitForFixedUpdate();
+                yield return new WaitForFixedUpdate();
+                bool check = newPath.GetComponent<Pathway>().isColliding;
+                if (check)
                 {
                     continue;
                 }
@@ -407,7 +408,7 @@ public class GameManager : NetworkBehaviour
             Destroy(newPath);
             NetworkServer.Destroy(newPath);
         }
-        return;
+        yield break;
     }
     [Server]
     private void TurnOffConnPoint(Pathway path, ConnectionPoint connPoint)
@@ -440,7 +441,7 @@ public class GameManager : NetworkBehaviour
         GameObject pathCollider = newPath.transform.Find("PathColl").gameObject;
         Bounds bounds = pathCollider.GetComponent<BoxCollider>().bounds;
 
-        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size/2, pathCollider.transform.rotation, pathLayerMask);
+        Collider[] colliders = Physics.OverlapBox(bounds.center, bounds.size/1.8f, pathCollider.transform.rotation, pathLayerMask);
 
         foreach (Collider coll in colliders)
         {
@@ -466,7 +467,7 @@ public class GameManager : NetworkBehaviour
         return false;
     }
     [Server]
-    private bool PositionNewPath(GameObject newPath, ConnectionPoint currentPoint, ConnectionPoint pointToPlace)
+    private void PositionNewPath(GameObject newPath, ConnectionPoint currentPoint, ConnectionPoint pointToPlace)
     {
 
         Vector3 pointToPlaceEuler = pointToPlace.transform.eulerAngles;
@@ -477,7 +478,7 @@ public class GameManager : NetworkBehaviour
 
         Vector3 pathPositionOffset = currentPoint.transform.position - newPath.transform.position;
         newPath.transform.position = pointToPlace.transform.position - pathPositionOffset;
-        return NewPathOverlap(newPath.GetComponent<Pathway>());
+        return;
     }
     [Server]
     private void AddConnectionPoints(Pathway pathway)
@@ -513,7 +514,7 @@ public class GameManager : NetworkBehaviour
     [Server]
     public void MonsterSpawn()
     {
-        int amountOfMonster = 1 + Mathf.FloorToInt((currentStageNumber * NumberofPlayers) / 3);
+        int amountOfMonster = 3 + Mathf.FloorToInt((currentStageNumber * NumberofPlayers) / 3);
         for (int i = 0; i < amountOfMonster; i++)
         {
             GameObject monsterSpawn = MonsterList.monsterList.Monsters[Random.Range(0, MonsterList.monsterList.Monsters.Count)];

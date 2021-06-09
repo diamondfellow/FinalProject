@@ -136,13 +136,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 768510505834305664}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
   m_LocalPosition: {x: -0.000019000001, y: 0.009990001, z: 0.01}
   m_LocalScale: {x: 0.01977628, y: 0.01957476, z: 0.002}
   m_Children: []
   m_Father: {fileID: 5714597882256631712}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 270, y: 0, z: 0}
 --- !u!33 &6189989734794079290
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -275,13 +275,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1154574838662674542}
-  m_LocalRotation: {x: -0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalRotation: {x: 0.5, y: -0.5, z: 0.5, w: -0.5}
   m_LocalPosition: {x: 0.059902914, y: 0, z: 0.010000006}
   m_LocalScale: {x: 0.004, y: 0.02, z: 0.26}
   m_Children: []
   m_Father: {fileID: 5714597882256631712}
   m_RootOrder: 5
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: -90}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 270}
 --- !u!33 &5695987078172521302
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -480,7 +480,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 5714597882256631712}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: -180, y: 90, z: -90}
+  m_LocalEulerAnglesHint: {x: 180, y: 90, z: 270}
 --- !u!33 &3967407294088761234
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -812,6 +812,7 @@ GameObject:
   - component: {fileID: 8516078890079391329}
   - component: {fileID: 5425101935627856513}
   - component: {fileID: 3120271119288721907}
+  - component: {fileID: 6680543527609629485}
   m_Layer: 6
   m_Name: 4way
   m_TagString: Untagged
@@ -906,6 +907,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf190f46a0f1a94ba5d897640cf18d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   connectionPoints:
   - {fileID: 3425947942403563417}
   - {fileID: 2471808515124055894}
@@ -929,7 +932,12 @@ MonoBehaviour:
   - {fileID: 3429520406440958847}
   - {fileID: 7497398395582330576}
   monsterSpawn: {fileID: 2002075836744830954}
+  pathCollider: {fileID: 44493782719138656}
   meshCollider: {fileID: 5425101935627856513}
+  isColliding: 0
+  pathLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &6211300502396124647
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -996,6 +1004,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+--- !u!54 &6680543527609629485
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4901469814400974106}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 3
 --- !u!1 &5089296019822543489
 GameObject:
   m_ObjectHideFlags: 0

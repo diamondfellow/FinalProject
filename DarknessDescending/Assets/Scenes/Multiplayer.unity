@@ -514,7 +514,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7596720585061005296, guid: 65b68ff695342914ba1ca710c1e973de, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 4.868
+      value: 2.93
       objectReference: {fileID: 0}
     - target: {fileID: 7596720585061005296, guid: 65b68ff695342914ba1ca710c1e973de, type: 3}
       propertyPath: m_LocalPosition.y
@@ -522,7 +522,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7596720585061005296, guid: 65b68ff695342914ba1ca710c1e973de, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -6.835
+      value: -2.74
       objectReference: {fileID: 0}
     - target: {fileID: 7596720585061005296, guid: 65b68ff695342914ba1ca710c1e973de, type: 3}
       propertyPath: m_LocalRotation.w
@@ -13059,6 +13059,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf190f46a0f1a94ba5d897640cf18d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   connectionPoints:
   - {fileID: 6401317536450186743}
   puzzlePoints:
@@ -13067,7 +13069,12 @@ MonoBehaviour:
   - {fileID: 4194157979893447271}
   - {fileID: 1458468479551781340}
   monsterSpawn: {fileID: 8909185824182893952}
+  pathCollider: {fileID: 7277813062391372944}
   meshCollider: {fileID: 3432456094807958090}
+  isColliding: 0
+  pathLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &6721424715768081211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13080,6 +13087,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf190f46a0f1a94ba5d897640cf18d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   connectionPoints:
   - {fileID: 6401317536600242771}
   puzzlePoints:
@@ -13088,7 +13097,12 @@ MonoBehaviour:
   - {fileID: 4194157981622177219}
   - {fileID: 1458468478864789112}
   monsterSpawn: {fileID: 8909185822989961764}
+  pathCollider: {fileID: 7277813062778202932}
   meshCollider: {fileID: 3432456093886420462}
+  isColliding: 0
+  pathLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &6721424715860038949
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13101,6 +13115,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf190f46a0f1a94ba5d897640cf18d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   connectionPoints:
   - {fileID: 6238060779861989367}
   puzzlePoints:
@@ -13109,7 +13125,12 @@ MonoBehaviour:
   - {fileID: 4194157981728306141}
   - {fileID: 1458468478689898598}
   monsterSpawn: {fileID: 8909185822901548090}
+  pathCollider: {fileID: 7277813062670406954}
   meshCollider: {fileID: 3432456093992020976}
+  isColliding: 0
+  pathLayer:
+    serializedVersion: 2
+    m_Bits: 384
 --- !u!114 &6721424716054941489
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13122,6 +13143,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf190f46a0f1a94ba5d897640cf18d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   connectionPoints:
   - {fileID: 6238060780606606819}
   puzzlePoints:
@@ -13130,7 +13153,12 @@ MonoBehaviour:
   - {fileID: 4194157981000722889}
   - {fileID: 1458468478377290354}
   monsterSpawn: {fileID: 8909185823209696814}
+  pathCollider: {fileID: 7277813063431540542}
   meshCollider: {fileID: 3432456093633540580}
+  isColliding: 0
+  pathLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!1 &6820709777141414277
 GameObject:
   m_ObjectHideFlags: 0

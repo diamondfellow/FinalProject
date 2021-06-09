@@ -8,8 +8,12 @@ public class Mop : Enemies
 {
     [SerializeField] private float moveTime;
     [SerializeField] private float moveRadius = 2;
+    [SerializeField] private SphereCollider playerDetect;
     private float timer;
     private float randomMoveTime;
+    private bool playerRange = false;
+    private List<GameObject> playersInRange = new List<GameObject>();
+    private GameObject closestPlayer;
     private void Start()
     {
         randomMoveTime = Random.Range(moveTime - 2, moveTime + 2);
@@ -17,21 +21,49 @@ public class Mop : Enemies
     [ServerCallback]
     void Update()
     {
-        timer += Time.deltaTime;
-        if (timer > randomMoveTime)
+        if (!playerRange)
         {
-            DetermineNextPosition();
-            timer = 0;
-            randomMoveTime = Random.Range(moveTime - 2, moveTime + 2);
+            timer += Time.deltaTime;
+            if (timer > randomMoveTime)
+            {
+                DetermineNextPosition();
+                timer = 0;
+                randomMoveTime = Random.Range(moveTime - 2, moveTime + 2);
+            }
+            if (navAgent.hasPath && !GetComponent<AudioSource>().isPlaying)
+            {
+                GameManager.gameMan.RpcPlaySound(gameObject, "MopMove");
+            }
+            else if (!navAgent.hasPath)
+            {
+                GameManager.gameMan.RpcStopSound(gameObject);
+            }
         }
-        if (navAgent.hasPath && !GetComponent<AudioSource>().isPlaying)
+        else if (playerRange)
         {
-            GameManager.gameMan.RpcPlaySound(gameObject, "MopMove");
+            float closestplayerDistance = -10000;
+            foreach(GameObject player in playersInRange)
+            {
+                if(closestplayerDistance == -10000)
+                {
+                    closestplayerDistance = Mathf.Abs(Vector3.Distance(transform.position, player.transform.position));
+                    closestPlayer = player;
+                }
+                else if(closestplayerDistance > Mathf.Abs(Vector3.Distance(transform.position, player.transform.position)))
+                {
+                    closestPlayer = player;
+                    closestplayerDistance = Mathf.Abs(Vector3.Distance(transform.position, player.transform.position));
+                }
+            }
+            ChasePlayer();
         }
-        else if (!navAgent.hasPath)
-        {
-            GameManager.gameMan.RpcStopSound(gameObject);
-        }
+    }
+    [Server]
+    private void ChasePlayer()
+    {
+        NavMeshHit hit;
+        NavMesh.SamplePosition(closestPlayer.transform.position, out hit, playerDetect.radius * 2, 1);
+        Move(hit.position); 
     }
     [Server]
     private void DetermineNextPosition()
@@ -43,5 +75,26 @@ public class Mop : Enemies
         NavMesh.SamplePosition(randomDirection, out hit, moveRadius, 1);
         Move(hit.position);
     }
-    
+    [ServerCallback]
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.gameObject.tag == "Player")
+        {
+            playersInRange.Add(other.gameObject);
+            playerRange = true;
+        }
+    }
+    [ServerCallback]
+    private void OnTriggerExit(Collider other)
+    {
+        if(other.gameObject.tag == "Player")
+        {
+            playersInRange.Remove(other.gameObject);
+        }
+        if(playersInRange.Count == 0)
+        {
+            playerRange = false;
+        }
+    }
+
 }

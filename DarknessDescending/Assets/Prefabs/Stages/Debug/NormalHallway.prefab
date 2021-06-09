@@ -110,6 +110,7 @@ GameObject:
   - component: {fileID: 3635559776138394323}
   - component: {fileID: 3432456093853535114}
   - component: {fileID: 965462206720134221}
+  - component: {fileID: 5694949273048406676}
   m_Layer: 6
   m_Name: NormalHallway
   m_TagString: Untagged
@@ -202,6 +203,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fbf190f46a0f1a94ba5d897640cf18d9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   connectionPoints:
   - {fileID: 6238060779984091021}
   - {fileID: 6401317536573645879}
@@ -211,7 +214,12 @@ MonoBehaviour:
   - {fileID: 4194157981581956007}
   - {fileID: 1458468478828498972}
   monsterSpawn: {fileID: 8909185823022847040}
+  pathCollider: {fileID: 7277813062817412432}
   meshCollider: {fileID: 3432456093853535114}
+  isColliding: 0
+  pathLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &4649489205505059038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -278,6 +286,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+--- !u!54 &5694949273048406676
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3340752197799300471}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 126
+  m_CollisionDetection: 3
 --- !u!1 &3746639172456669383
 GameObject:
   m_ObjectHideFlags: 0
@@ -382,13 +406,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4450758742968177571}
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: -0.7071068}
   m_LocalPosition: {x: -0, y: 0.009985715, z: 0.01}
   m_LocalScale: {x: 0.02, y: 0.02, z: 0.002}
   m_Children: []
   m_Father: {fileID: 2672724476207994829}
   m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 270, y: 0, z: 0}
 --- !u!33 &6455793331558976846
 MeshFilter:
   m_ObjectHideFlags: 0
